@@ -1,5 +1,9 @@
 package chess;
 
+import pieces_rules.Bishoprules;
+import pieces_rules.Kingrules;
+import pieces_rules.Queenrules;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -20,18 +24,6 @@ public class ChessPiece {
         this.type = type;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pieceColor, type);
-    }
 
     /**
      * The various different chess piece options
@@ -49,14 +41,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -66,7 +58,14 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
-    }
+//    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+//
+////        return (switch (board.getPiece(myPosition).getPieceType()) {
+////            case KING -> new Kingrules();
+////            case QUEEN -> new Queenrules();
+////            case BISHOP -> new Bishoprules();
+////
+////        }).pieceMoves(board, myPosition);
+//
+//    }
 }
