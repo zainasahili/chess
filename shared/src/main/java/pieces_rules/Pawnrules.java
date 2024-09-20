@@ -12,33 +12,46 @@ public class Pawnrules implements Piecesrules{
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
         ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
+        boolean blocked = false;
 
         int step = (color == ChessGame.TeamColor.WHITE ? 1 : -1);
 
-        // if pawn is at starting line(2 steps)
-        if ((color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7)
-                || (color == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2)) {
-
-            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + (2 * step), myPosition.getColumn());
-            if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
-        }
         // if pawn is not at starting line or starting(1 step)
         int row = myPosition.getRow() + step;
         if ((color == ChessGame.TeamColor.BLACK && myPosition.getRow() >= 1) ||
-            (color == ChessGame.TeamColor.WHITE && myPosition.getRow() <= 8)) {
+                (color == ChessGame.TeamColor.WHITE && myPosition.getRow() <= 8)) {
             ChessPosition newPosition = new ChessPosition(row, myPosition.getColumn());
             if (board.getPiece(newPosition) == null)
-                moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
+                moves.add(new ChessMove(myPosition, newPosition, null));
+            else
+                blocked = true;
         }
+
+        // if pawn is at starting line(2 steps)
+        if (!blocked && ((color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7)
+                || (color == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2))) {
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + (2 * step), myPosition.getColumn());
+            if (board.getPiece(newPosition) == null)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+
+        }
+
         // if there's an enemy diagonally
-        int col = myPosition.getColumn() + step;
-        ChessPosition newPosition = new ChessPosition(row, col);
+        int col_right = myPosition.getColumn() + step;
+        int col_left = myPosition.getColumn() - step;
+        ChessPosition newPosition = new ChessPosition(row, col_right);
         if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
-            moves.add(new ChessMove(myPosition, newPosition, board.getPiece(newPosition).getPieceType()));
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        newPosition = new ChessPosition(row, col_left);
+        if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
+            moves.add(new ChessMove(myPosition, newPosition, null));
+
+
+
 
 
         // if pawn is at then edge of the board
+
         if (row == 1 || row == 8){
             ArrayList<ChessMove> change = new ArrayList<>();
             for (ChessMove move: moves) {
