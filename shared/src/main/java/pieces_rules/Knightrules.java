@@ -20,8 +20,8 @@ public class Knightrules implements Piecesrules{
                 int row = myPosition.getRow() + i;
                 int col= myPosition.getColumn() + j;
                 if ((row >= 1 && row <= 8 && col >= 1 && col <= 8) &&
-                        (abs(col - myPosition.getColumn()) == 2 && abs(row - myPosition.getRow()) == 1) ||
-                        (abs(col - myPosition.getColumn()) == 1 && abs(row - myPosition.getRow()) == 2)){
+                        ((abs(col - myPosition.getColumn()) == 2 && abs(row - myPosition.getRow()) == 1) ||
+                        (abs(col - myPosition.getColumn()) == 1 && abs(row - myPosition.getRow()) == 2))){
                     ChessPosition newPosition = new ChessPosition(row, col);
                     ChessPiece piece = board.getPiece(newPosition);
                     if(piece == null || piece.getTeamColor() != color){
