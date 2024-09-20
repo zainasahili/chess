@@ -7,24 +7,42 @@ import chess.ChessMove;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 
 public class Kingrules implements Piecesrules{
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
 
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
+
+        for (int i = 1; i >= -1; i--) {
+            for (int j = 0; j <= 1; j++) {
                 int row = myPosition.getRow() + i;
                 int column = myPosition.getColumn() + j;
                 if (row >= 1 && row <= 8 && column >= 1 && column <= 8) {
                     ChessPosition newPosition = new ChessPosition(row, column);
                     ChessPiece piece = board.getPiece(newPosition);
                     if (piece == null || (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
-                        moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
+                        moves.add(new ChessMove(myPosition, newPosition, null));
                     }
+
+                }
+            }
+        }
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = 0; j >= -1; j--) {
+                int row = myPosition.getRow() + i;
+                int column = myPosition.getColumn() + j;
+                if (row >= 1 && row <= 8 && column >= 1 && column <= 8) {
+                    ChessPosition newPosition = new ChessPosition(row, column);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece == null || (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    }
+
                 }
             }
         }
