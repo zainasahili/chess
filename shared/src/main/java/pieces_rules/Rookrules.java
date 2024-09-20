@@ -1,30 +1,25 @@
 package pieces_rules;
 
-import chess.ChessBoard;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import chess.ChessMove;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 
-public class Queenrules implements Piecesrules{
+public class Rookrules implements Piecesrules{
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ArrayList<ChessMove> moves = new ArrayList<>();
+        ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
 
-        for (int i = -7; i < 8; i++) {
-            for (int j = -7; j < 8; j++) {
+        for (int i = -7; i <= 7; i++) {
+            for (int j = -7; j <= 7; j++) {
                 int row = myPosition.getRow() + i;
-                int column = myPosition.getColumn() + j;
-
-                if (row >= 1 && row <= 8 && column >= 1 && column <= 8
-                && (row - myPosition.getRow() == column - myPosition.getColumn()) ||
-                        (row - myPosition.getRow() == 0) || (column - myPosition.getColumn() == 0)) {
-
-                    ChessPosition newPosition = new ChessPosition(row, column);
+                int col = myPosition.getColumn() + j;
+                if( row <= 8 && row >= 1 && 8 >= col && col >= 1 &&
+                        (row == myPosition.getRow() || col == myPosition.getColumn()) ) {
+                    ChessPosition newPosition = new ChessPosition(row, col);
                     ChessPiece piece = board.getPiece(newPosition);
                     if (piece == null)
                         moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
@@ -35,7 +30,9 @@ public class Queenrules implements Piecesrules{
                         break;
 
                     }
+
                 }
+
             }
         }
         return moves;

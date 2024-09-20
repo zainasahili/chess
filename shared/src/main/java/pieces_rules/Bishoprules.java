@@ -7,27 +7,127 @@ import chess.ChessMove;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+
+import static java.lang.Math.abs;
 
 
 public class Bishoprules implements Piecesrules{
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        Collection<ChessMove> moves = new HashSet<>();
 
-        for (int i = -7; i < 8; i++) {
-            for (int j = -7; j < 8; j++) {
-                    int row = myPosition.getRow() + i;
-                    int column = myPosition.getColumn() + j;
-                    if (row >= 1 && row <= 8 && column >= 1 && column <= 8 && row != column
-                            && row - myPosition.getRow() == column - myPosition.getColumn()) {
-                        ChessPosition newPosition = new ChessPosition(row, column);
-                        ChessPiece piece = board.getPiece(newPosition);
-                        if (piece != null || piece.getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
-                            moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
-                        }
+        // up right
+        outerloop:
+        for (int i = 1; i <= 7; i++) {
+            for (int j = i; j <= 7; j++) {
+                int row = myPosition.getRow() + i;
+                int column = myPosition.getColumn() + j;
+                if (row <= 8 && column <= 8
+                        && (abs(row- myPosition.getRow()) == abs(column-myPosition.getColumn()))) {
+                    ChessPosition newPosition = new ChessPosition(row, column);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece == null)
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    else {
+                        if (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())
+                            moves.add(new ChessMove(myPosition, newPosition, null));
+                        break outerloop;
                     }
+                }
+                else{
+                    if (row < 1 || row > 8)
+                        break;
+                }
             }
+
+        }
+        // down right
+        outerloop:
+        for (int i = -1; i >= -7; i--) {
+            int length = moves.size();
+            for (int j = 1; j <= 7; j++) {
+                int row = myPosition.getRow() + i;
+                int column = myPosition.getColumn() + j;
+                if (row >= 1 && row <= 8 && column >= 1 && column <= 8
+                        && (abs(row- myPosition.getRow()) == abs(column-myPosition.getColumn()))
+                        && (row != myPosition.getRow()) && (column != myPosition.getColumn())) {
+                    ChessPosition newPosition = new ChessPosition(row, column);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece == null)
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    else {
+                        if (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())
+                            moves.add(new ChessMove(myPosition, newPosition, null));
+                        break outerloop;
+
+                    }
+                }
+                else{
+                    if (row < 1 || row > 8)
+                        break;
+                }
+            }
+
+        }
+
+        // down left
+        outerloop:
+        for (int i = -1; i >= -7; i--) {
+            int length = moves.size();
+            for (int j = i; j >= -7; j--) {
+                int row = myPosition.getRow() + i;
+                int column = myPosition.getColumn() + j;
+                if (row >= 1 && row <= 8 && column >= 1 && column <= 8
+                        && (abs(row- myPosition.getRow()) == abs(column-myPosition.getColumn()))
+                        && (row != myPosition.getRow()) && (column != myPosition.getColumn())) {
+                    ChessPosition newPosition = new ChessPosition(row, column);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece == null)
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    else {
+                        if (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())
+                            moves.add(new ChessMove(myPosition, newPosition, null));
+                        break outerloop;
+
+                    }
+                }
+                else{
+                    if (row < 1 || row > 8)
+                        break;
+                }
+            }
+
+        }
+
+        // up left
+        outerloop:
+        for (int i = 1; i <= 7; i++) {
+            int length = moves.size();
+            for (int j = -1; j >= -7; j--) {
+                int row = myPosition.getRow() + i;
+                int column = myPosition.getColumn() + j;
+                if (row >= 1 && row <= 8 && column >= 1 && column <= 8
+                        && (abs(row- myPosition.getRow()) == abs(column-myPosition.getColumn()))
+                        && (row != myPosition.getRow()) && (column != myPosition.getColumn())) {
+                    ChessPosition newPosition = new ChessPosition(row, column);
+                    ChessPiece piece = board.getPiece(newPosition);
+                    if (piece == null)
+                        moves.add(new ChessMove(myPosition, newPosition, null));
+                    else {
+                        if (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())
+                            moves.add(new ChessMove(myPosition, newPosition, null));
+                        break outerloop;
+
+                    }
+                }
+                else{
+                    if (row < 1 || row > 8)
+                        break;
+                }
+            }
+
         }
         return moves;
     }

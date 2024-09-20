@@ -39,6 +39,16 @@ public class Pawnrules implements Piecesrules{
 
 
         // if pawn is at then edge of the board
+        if (row == 1 || row == 8){
+            ArrayList<ChessMove> change = new ArrayList<>();
+            for (ChessMove move: moves) {
+                change.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), ChessPiece.PieceType.KNIGHT));
+                change.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), ChessPiece.PieceType.QUEEN));
+                change.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), ChessPiece.PieceType.ROOK));
+                change.add(new ChessMove(move.getStartPosition(), move.getEndPosition(), ChessPiece.PieceType.BISHOP));
+            }
+            return change;
+        }
         return moves;
     }
 }

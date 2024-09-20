@@ -1,8 +1,6 @@
 package chess;
 
-import pieces_rules.Bishoprules;
-import pieces_rules.Kingrules;
-import pieces_rules.Queenrules;
+import pieces_rules.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +17,20 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -58,14 +69,33 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
-//    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//
-////        return (switch (board.getPiece(myPosition).getPieceType()) {
-////            case KING -> new Kingrules();
-////            case QUEEN -> new Queenrules();
-////            case BISHOP -> new Bishoprules();
-////
-////        }).pieceMoves(board, myPosition);
-//
-//    }
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+
+        return (switch (board.getPiece(myPosition).getPieceType()) {
+            case KING -> new Kingrules();
+            case QUEEN -> new Queenrules();
+            case BISHOP -> new Bishoprules();
+            case KNIGHT -> new Knightrules();
+            case ROOK -> new Rookrules();
+            case PAWN -> new Pawnrules();
+
+        }).pieceMoves(board, myPosition);
+
+    }
+
+    @Override
+    public String toString() {
+        char c = switch (getPieceType()){
+            case KING -> 'k';
+            case QUEEN -> 'q';
+            case BISHOP -> 'b';
+            case KNIGHT -> 'n';
+            case ROOK -> 'r';
+            case PAWN -> 'p';
+        };
+        return switch(getTeamColor()){
+            case WHITE -> String.valueOf(c).toUpperCase();
+            case BLACK -> String.valueOf(c).toLowerCase();
+        };
+    }
 }

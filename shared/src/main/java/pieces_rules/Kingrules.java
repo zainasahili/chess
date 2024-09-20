@@ -22,7 +22,7 @@ public class Kingrules implements Piecesrules{
                 if (row >= 1 && row <= 8 && column >= 1 && column <= 8) {
                     ChessPosition newPosition = new ChessPosition(row, column);
                     ChessPiece piece = board.getPiece(newPosition);
-                    if (piece != null && piece.getTeamColor() != board.getPiece(myPosition).getTeamColor()) {
+                    if (piece == null || (piece.getTeamColor() != board.getPiece(myPosition).getTeamColor())) {
                         moves.add(new ChessMove(myPosition, newPosition, board.getPiece(myPosition).getPieceType()));
                     }
                 }
