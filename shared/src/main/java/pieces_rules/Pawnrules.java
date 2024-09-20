@@ -40,12 +40,15 @@ public class Pawnrules implements Piecesrules{
         int col_right = myPosition.getColumn() + step;
         int col_left = myPosition.getColumn() - step;
         ChessPosition newPosition = new ChessPosition(row, col_right);
-        if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
-            moves.add(new ChessMove(myPosition, newPosition, null));
-        newPosition = new ChessPosition(row, col_left);
-        if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
-            moves.add(new ChessMove(myPosition, newPosition, null));
-
+        if (col_right >= 1 && col_right <= 8) {
+            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+        }
+        if (col_left >= 1 && col_left <= 8) {
+            newPosition = new ChessPosition(row, col_left);
+            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
+                moves.add(new ChessMove(myPosition, newPosition, null));
+        }
 
 
 
