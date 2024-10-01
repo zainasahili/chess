@@ -108,14 +108,13 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++){
             for(int j =1; j <=8; j++){
                 ChessPiece enemy = Board.getPiece(new ChessPosition(i, j));
+                if (enemy == null || enemy.getTeamColor() == teamTurn)
+                    continue;
 
-                if (enemy != null && enemy.getPieceType() != ChessPiece.PieceType.KING
-                        && enemy.getTeamColor() != teamTurn) {
-                    Collection<ChessMove> enemy_moves = enemy.pieceMoves(Board, new ChessPosition(i, j));
-                    for (ChessMove move: enemy_moves){
-                        if (move.getEndPosition() == king){
-                            return true;
-                        }
+                Collection<ChessMove> enemy_moves = enemy.pieceMoves(Board, new ChessPosition(i, j));
+                for (ChessMove move: enemy_moves){
+                    if (move.getEndPosition().equals(king)){
+                        return true;
                     }
                 }
             }
