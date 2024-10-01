@@ -11,10 +11,10 @@ import java.util.HashSet;
  */
 public class ChessGame {
     private TeamColor teamTurn;
-    private ChessBoard board;
+    private ChessBoard Board;
 
     public ChessGame() {
-        board = new ChessBoard();
+        Board = new ChessBoard();
         setTeamTurn(TeamColor.WHITE);
     }
 
@@ -50,20 +50,20 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> all_moves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+        Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
-        TeamColor color = board.getPiece(startPosition).getTeamColor();
-        ChessPiece piece = board.getPiece(startPosition);
+        TeamColor color = Board.getPiece(startPosition).getTeamColor();
+        ChessPiece piece = Board.getPiece(startPosition);
 
         for (ChessMove move:  all_moves){
-            ChessPiece temporary = board.getPiece(move.getEndPosition());
-            board.addPiece(startPosition, null);
-            board.addPiece(move.getEndPosition(), piece);
+            ChessPiece temporary = Board.getPiece(move.getEndPosition());
+            Board.addPiece(startPosition, null);
+            Board.addPiece(move.getEndPosition(), piece);
             if(!isInCheck(color))
                 validMoves.add(move);
 
-            board.addPiece(startPosition, piece);
-            board.addPiece(move.getEndPosition(), temporary);
+            Board.addPiece(startPosition, piece);
+            Board.addPiece(move.getEndPosition(), temporary);
         }
 
         return validMoves;
@@ -76,8 +76,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-        board.addPiece(move.getStartPosition(), null);
+        Board.addPiece(move.getEndPosition(), Board.getPiece(move.getStartPosition()));
+        Board.addPiece(move.getStartPosition(), null);
     }
 
     /**
@@ -117,7 +117,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.Board = board;
     }
 
     /**
@@ -126,6 +126,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return Board;
     }
 }
