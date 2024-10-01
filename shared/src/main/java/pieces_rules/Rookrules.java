@@ -15,7 +15,7 @@ public class Rookrules implements Piecesrules{
         ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
 
         //right
-        for (int i = 1; i <= 8; i++){
+        for (int i = 1; i <= 7; i++){
             int col = myPosition.getColumn() + i;
             if (col >= 1 && col <= 8 ){
                 ChessPosition newPosition = new ChessPosition(myPosition.getRow(), col);

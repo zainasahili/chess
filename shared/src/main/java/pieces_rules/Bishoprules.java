@@ -5,7 +5,6 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessMove;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -46,7 +45,6 @@ public class Bishoprules implements Piecesrules{
         // down right
         outerloop:
         for (int i = -1; i >= -7; i--) {
-            int length = moves.size();
             for (int j = 1; j <= 7; j++) {
                 int row = myPosition.getRow() + i;
                 int column = myPosition.getColumn() + j;
@@ -75,7 +73,6 @@ public class Bishoprules implements Piecesrules{
         // down left
         outerloop:
         for (int i = -1; i >= -7; i--) {
-            int length = moves.size();
             for (int j = i; j >= -7; j--) {
                 int row = myPosition.getRow() + i;
                 int column = myPosition.getColumn() + j;
@@ -104,7 +101,7 @@ public class Bishoprules implements Piecesrules{
         // up left
         outerloop:
         for (int i = 1; i <= 7; i++) {
-            int length = moves.size();
+
             for (int j = -1; j >= -7; j--) {
                 int row = myPosition.getRow() + i;
                 int column = myPosition.getColumn() + j;
