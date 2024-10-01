@@ -50,22 +50,23 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
         Collection<ChessMove> validMoves = new HashSet<>();
-        TeamColor color = Board.getPiece(startPosition).getTeamColor();
-        ChessPiece piece = Board.getPiece(startPosition);
+        if (Board.getPiece(startPosition) != null) {
+            Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
+            TeamColor color = Board.getPiece(startPosition).getTeamColor();
+            ChessPiece piece = Board.getPiece(startPosition);
 
-        for (ChessMove move:  all_moves){
-            ChessPiece temporary = Board.getPiece(move.getEndPosition());
-            Board.addPiece(startPosition, null);
-            Board.addPiece(move.getEndPosition(), piece);
-            if(!isInCheck(color))
-                validMoves.add(move);
+            for (ChessMove move : all_moves) {
+                ChessPiece temporary = Board.getPiece(move.getEndPosition());
+                Board.addPiece(startPosition, null);
+                Board.addPiece(move.getEndPosition(), piece);
+                if (!isInCheck(color))
+                    validMoves.add(move);
 
-            Board.addPiece(startPosition, piece);
-            Board.addPiece(move.getEndPosition(), temporary);
+                Board.addPiece(startPosition, piece);
+                Board.addPiece(move.getEndPosition(), temporary);
+            }
         }
-
         return validMoves;
     }
 
