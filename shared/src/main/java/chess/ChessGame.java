@@ -76,8 +76,16 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        Board.addPiece(move.getEndPosition(), Board.getPiece(move.getStartPosition()));
-        Board.addPiece(move.getStartPosition(), null);
+        if (validMoves(move.getStartPosition()) == null){
+            throw new InvalidMoveException("No valid moves");
+        }
+        else if (validMoves(move.getStartPosition()).contains(move) &&
+                Board.getPiece(move.getStartPosition()).getTeamColor() == teamTurn ) {
+            Board.addPiece(move.getEndPosition(), Board.getPiece(move.getStartPosition()));
+            Board.addPiece(move.getStartPosition(), null);
+        }
+        else
+            throw new InvalidMoveException("invalid move: " + move);
     }
 
     /**
@@ -87,7 +95,33 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition king = null;
+        for (int  i = 1; i <=8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                if (Board.getPiece(new ChessPosition(i, j)) != null &&
+                        Board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING
+                        && Board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamTurn) {
+                    king = new ChessPosition(i, j);
+                }
+            }
+        }
+        for (int i = 1; i <= 8; i++){
+            for(int j =1; j <=8; j++){
+                ChessPiece enemy = Board.getPiece(new ChessPosition(i, j));
+
+                if (enemy != null && enemy.getPieceType() != ChessPiece.PieceType.KING
+                        && enemy.getTeamColor() != teamTurn) {
+                    Collection<ChessMove> enemy_moves = enemy.pieceMoves(Board, new ChessPosition(i, j));
+                    for (ChessMove move: enemy_moves){
+                        if (move.getEndPosition() == king){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
