@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -32,6 +33,27 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         teamTurn = team;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return teamTurn == chessGame.teamTurn && Objects.equals(Board, chessGame.Board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, Board);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "teamTurn=" + teamTurn +
+                ", Board=" + Board +
+                '}';
     }
 
     /**
@@ -77,13 +99,26 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+
         if (validMoves(move.getStartPosition()) == null){
             throw new InvalidMoveException("No valid moves");
         }
         else if (validMoves(move.getStartPosition()).contains(move) &&
-                Board.getPiece(move.getStartPosition()).getTeamColor() == teamTurn ) {
-            Board.addPiece(move.getEndPosition(), Board.getPiece(move.getStartPosition()));
+            Board.getPiece(move.getStartPosition()).getTeamColor() == teamTurn ) {
+            Board.addPiece(move.getEndPosition(), getBoard().getPiece(move.getStartPosition()));
+
+            if (move.getPromotionPiece() != null){
+                ChessPiece it  = new ChessPiece(getBoard().getPiece(move.getStartPosition()).getTeamColor(),
+                        move.getPromotionPiece());
+                Board.addPiece(move.getEndPosition(), it);
+            }
+
             Board.addPiece(move.getStartPosition(), null);
+            if (getTeamTurn() == TeamColor.WHITE)
+                setTeamTurn(TeamColor.BLACK);
+            else
+                setTeamTurn(TeamColor.WHITE);
+
         }
         else
             throw new InvalidMoveException("invalid move: " + move);

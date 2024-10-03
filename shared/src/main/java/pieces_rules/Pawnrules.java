@@ -18,8 +18,8 @@ public class Pawnrules implements Piecesrules{
 
         // if pawn is not at starting line or starting(1 step)
         int row = myPosition.getRow() + step;
-        if ((color == ChessGame.TeamColor.BLACK && myPosition.getRow() >= 1) ||
-                (color == ChessGame.TeamColor.WHITE && myPosition.getRow() <= 8)) {
+        if (myPosition.getRow() >= 2 && myPosition.getRow() <= 8 &&
+                myPosition.getColumn() >= 1 && myPosition.getColumn() <= 8){
             ChessPosition newPosition = new ChessPosition(row, myPosition.getColumn());
             if (board.getPiece(newPosition) == null)
                 moves.add(new ChessMove(myPosition, newPosition, null));
@@ -40,11 +40,11 @@ public class Pawnrules implements Piecesrules{
         int col_right = myPosition.getColumn() + step;
         int col_left = myPosition.getColumn() - step;
         ChessPosition newPosition = new ChessPosition(row, col_right);
-        if (col_right >= 1 && col_right <= 8) {
+        if (col_right >= 1 && col_right <= 8 && row >= 1 && row <= 8) {
             if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
                 moves.add(new ChessMove(myPosition, newPosition, null));
         }
-        if (col_left >= 1 && col_left <= 8) {
+        if (col_left >= 1 && col_left <= 8 && row >= 1 && row <= 8) {
             newPosition = new ChessPosition(row, col_left);
             if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
                 moves.add(new ChessMove(myPosition, newPosition, null));
