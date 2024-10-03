@@ -73,7 +73,9 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new HashSet<>();
-        if (Board.getPiece(startPosition) != null) {
+        if (getBoard().getPiece(startPosition) == null)
+            return null;
+        else {
             Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
             TeamColor color = Board.getPiece(startPosition).getTeamColor();
             ChessPiece piece = Board.getPiece(startPosition);
@@ -136,7 +138,7 @@ public class ChessGame {
             for (int j = 1; j <= 8; j++) {
                 if (Board.getPiece(new ChessPosition(i, j)) != null &&
                         Board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING
-                        && Board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamTurn) {
+                        && Board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
                     king = new ChessPosition(i, j);
                 }
             }
@@ -144,7 +146,7 @@ public class ChessGame {
         for (int i = 1; i <= 8; i++){
             for(int j =1; j <=8; j++){
                 ChessPiece enemy = Board.getPiece(new ChessPosition(i, j));
-                if (enemy == null || enemy.getTeamColor() == teamTurn)
+                if (enemy == null || enemy.getTeamColor() == teamColor)
                     continue;
 
                 Collection<ChessMove> enemy_moves = enemy.pieceMoves(Board, new ChessPosition(i, j));
