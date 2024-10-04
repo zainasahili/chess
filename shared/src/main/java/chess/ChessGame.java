@@ -16,6 +16,7 @@ public class ChessGame {
 
     public ChessGame() {
         Board = new ChessBoard();
+        Board.resetBoard();
         setTeamTurn(TeamColor.WHITE);
     }
 
@@ -35,33 +36,17 @@ public class ChessGame {
         teamTurn = team;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessGame chessGame = (ChessGame) o;
-        return teamTurn == chessGame.teamTurn && Objects.equals(Board, chessGame.Board);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(teamTurn, Board);
-    }
-
-    @Override
-    public String toString() {
-        return "ChessGame{" +
-                "teamTurn=" + teamTurn +
-                ", Board=" + Board +
-                '}';
-    }
-
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK;
+
+        @Override
+        public String toString() {
+            return this == WHITE? "white": "black";
+        }
     }
 
     /**
@@ -73,13 +58,11 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new HashSet<>();
-        if (getBoard().getPiece(startPosition) == null)
-            return null;
-        else {
+        if (Board.getPiece(startPosition) != null){
+
             Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
             TeamColor color = Board.getPiece(startPosition).getTeamColor();
             ChessPiece piece = Board.getPiece(startPosition);
-
             for (ChessMove move : all_moves) {
                 ChessPiece temporary = Board.getPiece(move.getEndPosition());
                 Board.addPiece(startPosition, null);
@@ -179,19 +162,17 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        Collection<ChessMove> all_moves = new HashSet<>();
         for (int x = 1; x <= 8; x++){
             for (int y = 1; y <= 8; y++){
                 ChessPiece piece = getBoard().getPiece(new ChessPosition(x,y));
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> moves = validMoves(new ChessPosition(x, y));
-                    all_moves.addAll(moves);
-
+                    if (!moves.isEmpty())
+                        return false;
                 }
             }
         }
-
-        return all_moves.isEmpty();
+        return true;
     }
 
     /**
@@ -210,5 +191,26 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return Board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return teamTurn == chessGame.teamTurn && Objects.equals(Board, chessGame.Board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, Board);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "teamTurn=" + teamTurn +
+                ", Board=" + Board +
+                '}';
     }
 }

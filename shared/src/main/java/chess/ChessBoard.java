@@ -11,6 +11,7 @@ import java.util.Objects;
  */
 public class ChessBoard {
     private ChessPiece[][] board =  new ChessPiece[8][8];
+
     public ChessBoard() {
         
     }
@@ -86,5 +87,6 @@ public class ChessBoard {
         return "ChessBoard{" +
                 "board=" + Arrays.toString(board) +
                 '}';
+
     }
 }
