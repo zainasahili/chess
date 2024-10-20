@@ -14,8 +14,15 @@ public class Server {
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
+        Spark.post("/user", this::register);
+
         Spark.awaitInitialization();
         return Spark.port();
+    }
+    private Object register(Request req, Response res){
+        return """
+                { "username":"", "password":"", "email":"" }
+                """;
     }
 
     public void stop() {
