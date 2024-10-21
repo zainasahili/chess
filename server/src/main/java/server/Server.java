@@ -1,6 +1,7 @@
 package server;
 
 import spark.*;
+import server.Handler;
 
 public class Server {
 
@@ -14,15 +15,16 @@ public class Server {
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
 
-        Spark.post("/user", this::register);
+        Spark.post("/user", Handler::register);
+        Spark.delete("/db", this::clear);
 
         Spark.awaitInitialization();
         return Spark.port();
     }
-    private Object register(Request req, Response res){
-        return """
-                { "username":"", "password":"", "email":"" }
-                """;
+
+    private Object clear(Request req, Response res){
+        res.status(200);
+        return "{}";
     }
 
     public void stop() {
