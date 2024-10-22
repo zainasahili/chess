@@ -1,9 +1,23 @@
 package server;
 
+import dataaccess.*;
+import model.AuthData;
 import spark.*;
 import server.Handler;
+import service.UserService;
+
+import java.util.HashSet;
 
 public class Server {
+
+    HashSet<AuthData> db = new HashSet<>();
+
+    UserDAO userDAO = new MemoryUser();
+    GameDAO gameDAO = new MemoryGame();
+    AuthDAO authDAO = new MemoryAuth();
+
+    UserService userService = new UserService(userDAO, gameDAO, authDAO);
+    Handler handler = new Handler(userService);
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -11,16 +25,18 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
-
-        Spark.post("/user", Handler::register);
+        Spark.post("/user", handler::register);
         Spark.delete("/db", this::clear);
+        //This line initializes the server and can be removed once you have a functioning endpoint 
+//        Spark.init();
+
+
 
         Spark.awaitInitialization();
         return Spark.port();
     }
+
+
 
     private Object clear(Request req, Response res){
         res.status(200);
