@@ -19,11 +19,11 @@ public class UserService {
     }
 
 
-    public AuthData createUser(UserData user) throws BadRequestException {
+    public AuthData createUser(UserData user) throws DataAccessException {
         try {
             userDAO.createUser(user);
         } catch (DataAccessException e) {
-            throw new BadRequestException(e.getMessage());
+            throw new DataAccessException(e.getMessage());
         }
 
         String authToken = UUID.randomUUID().toString();
