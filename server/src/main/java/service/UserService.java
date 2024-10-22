@@ -32,8 +32,33 @@ public class UserService {
 
         return authData;
     }
-//    public AuthData login(UserData user) {}
-//    public void logout(AuthData auth) {}
+    public AuthData loginUser(UserData user) throws DataAccessException {
+        boolean authorized;
+        AuthData authData;
+
+        authorized = userDAO.authorized(user.username(), user.password());
+
+        if (authorized){
+            String authToken = UUID.randomUUID().toString();
+            authData = new AuthData(authToken, user.username());
+            authDAO.add(authData);
+            return authData;
+        }
+        authData = null;
+        return authData;
+
+
+    }
+    public void logoutUser(String authToken) throws DataAccessException{
+
+        authDAO.getAuth(authToken);
+
+
+        authDAO.deleteAuth(authToken);
+
+
+    }
+
     public void clear(){
         userDAO.clear();
         gameDAO.clear();

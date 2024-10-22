@@ -18,6 +18,16 @@ public class MemoryUser implements UserDAO{
     }
 
     @Override
+    public boolean authorized(String username, String password) {
+        for (UserData user: db){
+            if (user.username().equals(username) && user.password().equals(password))
+                return true;
+
+        }
+        return false;
+    }
+
+    @Override
     public void createUser(UserData user) throws DataAccessException {
         try{
             getUser(user.username());

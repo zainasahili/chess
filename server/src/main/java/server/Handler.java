@@ -8,6 +8,8 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 
+import javax.xml.crypto.Data;
+
 public class Handler {
 
 
@@ -34,5 +36,32 @@ public class Handler {
             res.status(403);
             return ("{ \"message\": \"Error: username already taken\" }");
         }
+    }
+
+    public Object login(Request req, Response res) throws DataAccessException, BadRequestException{
+        UserData userData = new Gson().fromJson(req.body(), UserData.class);
+
+        AuthData authData = userService.loginUser(userData);
+
+        if (authData != null) {
+            res.status(200);
+            return new Gson().toJson(authData);
+        }
+        res.status(401);
+        return ("{ \"message\": \"Error: unauthorized\" }");
+    }
+
+    public Object logout(Request req, Response res) throws DataAccessException {
+        String authToken = req.headers("authorization");
+
+        try{
+            userService.logoutUser(authToken);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return ("{ \"message\": \"Error: unauthorized\" }");
+        }
+        res.status(200);
+        return "{}";
+
     }
 }

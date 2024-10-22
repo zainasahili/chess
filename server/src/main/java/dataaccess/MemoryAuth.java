@@ -9,6 +9,26 @@ public class MemoryAuth implements AuthDAO{
     HashSet<AuthData> db = new HashSet<>();
 
     @Override
+    public void deleteAuth(String authToken) {
+        for (AuthData data: db) {
+            if (data.authToken().equals(authToken)) {
+                db.remove(data);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public AuthData getAuth(String authToken) throws DataAccessException{
+        for (AuthData data: db) {
+            if (data.authToken().equals(authToken)) {
+                return data;
+            }
+        }
+        throw new DataAccessException("{ \"message\": \"Error: unauthorized\" }");
+    }
+
+    @Override
     public void add(AuthData data) {
             db.add(data);
     }
