@@ -10,9 +10,7 @@ import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 
-import javax.xml.crypto.Data;
 import java.util.HashSet;
-import java.util.List;
 
 public class Handler {
 
@@ -39,7 +37,7 @@ public class Handler {
             return new Gson().toJson(authData);
         } catch (DataAccessException e) {
             res.status(403);
-            return ("{ \"message\": \"Error: username already taken\" }");
+            return ("{ \"message\": \"Error: already taken\" }");
         }
     }
 
@@ -67,8 +65,8 @@ public class Handler {
         }
         res.status(200);
         return "{}";
-
     }
+
     public Object listGames(Request req, Response res) throws DataAccessException{
         String authToken = req.headers("authorization");
         HashSet<GameData> games;
@@ -83,5 +81,37 @@ public class Handler {
             return ("{ \"message\": \"There are no games\" }");
         res.status(200);
         return new Gson().toJson(games);
+    }
+
+    public Object createGame(Request req, Response res) throws DataAccessException{
+        String authToken = req.headers("authorization");
+        int gameID;
+        GameData game = new Gson().fromJson(req.body(), GameData.class);
+        try{
+            gameID = gameService.createGame(authToken, game);
+        } catch (DataAccessException e){
+            res.status(401);
+            return ("{ \"message\": \"Error: unauthorized\" }");
+        }
+
+        res.status(200);
+        return "{ \"gameID\": %d }".formatted(gameID);
+
+    }
+    public Object joinGame(Request req, Response res) throws DataAccessException{
+        String authToken = req.headers("authorization");
+        record JoinGame(String color, int gameID){};
+        JoinGame game = new Gson().fromJson(req.body(), JoinGame.class);
+
+        try{
+            gameService.joinGame(authToken, game.color(), game.gameID());
+        } catch (DataAccessException e){
+            res.status(401);
+            res.body("{ \"message\": \"Error: unauthorized\" }");
+        }
+
+        res.status(200);
+        return "{}";
+
     }
 }
