@@ -2,28 +2,33 @@ package server;
 
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
 import com.google.gson.Gson;
 
 import javax.xml.crypto.Data;
+import java.util.HashSet;
+import java.util.List;
 
 public class Handler {
 
 
     static UserService userService;
+    static GameService gameService;
 
-    public Handler(UserService userService) {
+    public Handler(UserService userService, GameService gameService) {
         Handler.userService = userService;
+        Handler.gameService = gameService;
     }
 
     public Object register(Request req, Response res) throws DataAccessException {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
         if (userData.username() == null || userData.password() == null) {
-//            return ("No username/password was given");
             res.status(400);
             return ("{ \"message\": \"Error: No username/password was given\" }");
         }
@@ -63,5 +68,20 @@ public class Handler {
         res.status(200);
         return "{}";
 
+    }
+    public Object listGames(Request req, Response res) throws DataAccessException{
+        String authToken = req.headers("authorization");
+        HashSet<GameData> games;
+        try {
+            games = gameService.listGames(authToken);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return ("{ \"message\": \"Error: unauthorized\" }");
+        }
+
+        if (games.isEmpty())
+            return ("{ \"message\": \"There are no games\" }");
+        res.status(200);
+        return new Gson().toJson(games);
     }
 }

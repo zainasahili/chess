@@ -9,12 +9,10 @@ import java.util.UUID;
 
 public class UserService {
         UserDAO userDAO;
-        GameDAO gameDAO;
         AuthDAO authDAO;
 
-    public UserService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
-        this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
 
@@ -44,24 +42,16 @@ public class UserService {
             authDAO.add(authData);
             return authData;
         }
-        authData = null;
-        return authData;
-
+        return null;
 
     }
     public void logoutUser(String authToken) throws DataAccessException{
-
         authDAO.getAuth(authToken);
-
-
         authDAO.deleteAuth(authToken);
-
-
     }
 
     public void clear(){
         userDAO.clear();
-        gameDAO.clear();
         authDAO.clear();
     }
 }
