@@ -4,9 +4,11 @@ import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import model.AuthData;
 import model.GameData;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Random;
 
 public class GameService {
@@ -32,11 +34,27 @@ public class GameService {
     }
 
     public void joinGame(String authToken, String color, int gameID) throws DataAccessException{
-        authDAO.getAuth(authToken);
-        if (!gameDAO.exists(gameID))
+        AuthData authData = authDAO.getAuth(authToken);
+        GameData game = gameDAO.getGame(gameID);
+        if ( game== null)
             throw new DataAccessException("Game doesn't exist");
 
-        // possibly change exists to getGame so we can use it to updateGame in the db?
-        // also, change gameDAO.join to updateGame as I have it in the diagram?
+        String whiteUsername = game.whiteUsername();
+        String blackUsername = game.blackUsername();
+        if (Objects.equals(color, "White")) {
+            if(whiteUsername != null && !whiteUsername.equals(authData.username()))
+                throw new DataAccessException("{ \"message\": \"Error: already taken\" }");
+            whiteUsername = authData.username();
+        }
+        else if (Objects.equals(color, "Black")) {
+            if (blackUsername != null && !blackUsername.equals(authData.username()))
+                throw new DataAccessException("{ \"message\": \"Error: already taken\" }");
+            blackUsername = authData.username();
+        }
+        try{
+            gameDAO.updateGame(new GameData(gameID, whiteUsername, blackUsername, game.gameName(), game.game()));
+        } catch (DataAccessException e){
+            throw new DataAccessException(" { \" message \": \" Error: bad request \"} ");
+        }
     }
 }

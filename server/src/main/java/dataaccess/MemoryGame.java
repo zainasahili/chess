@@ -20,22 +20,22 @@ public class MemoryGame implements GameDAO{
 
 
     @Override
-    public boolean exists(int gameID) {
+    public GameData getGame(int gameID) {
         for (GameData data: db)
             if (data.gameID() == gameID)
-                return true;
-        return false;
+                return data;
+        return null;
     }
 
     @Override
-    public void join(GameData game) {
+    public void updateGame(GameData game) throws DataAccessException{
 
     }
 
 
     @Override
     public int create(GameData game) throws DataAccessException{
-        if (exists(game.gameID()))
+        if (getGame(game.gameID()) != null)
             throw new DataAccessException("game already created");
 
         db.add(game);
