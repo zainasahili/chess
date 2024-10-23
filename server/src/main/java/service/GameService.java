@@ -33,7 +33,10 @@ public class GameService {
 
     public void joinGame(String authToken, String color, int gameID) throws DataAccessException{
         authDAO.getAuth(authToken);
-        gameDAO.exists(gameID);
+        if (!gameDAO.exists(gameID))
+            throw new DataAccessException("Game doesn't exist");
 
+        // possibly change exists to getGame so we can use it to updateGame in the db?
+        // also, change gameDAO.join to updateGame as I have it in the diagram?
     }
 }

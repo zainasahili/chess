@@ -36,7 +36,7 @@ public class MemoryGame implements GameDAO{
     @Override
     public int create(GameData game) throws DataAccessException{
         if (exists(game.gameID()))
-            throw new DataAccessException("game alerady created");
+            throw new DataAccessException("game already created");
 
         db.add(game);
         return game.gameID();
