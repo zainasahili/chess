@@ -1,9 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 
@@ -30,31 +28,31 @@ public class GameService {
     public int createGame(String authToken, GameData game) throws DataAccessException {
         authDAO.getAuth(authToken);
         int gameID = new Random().nextInt(1000);
+
         return gameDAO.create(new GameData(gameID, null, null, game.gameName(), new ChessGame()));
     }
 
-    public void joinGame(String authToken, String color, int gameID) throws DataAccessException{
-        AuthData authData = authDAO.getAuth(authToken);
-        GameData game = gameDAO.getGame(gameID);
-        if ( game== null)
-            throw new DataAccessException("Game doesn't exist");
+    public void joinGame(String authToken, ChessGame.TeamColor color, int gameID) throws DataAccessException, BadRequestException, TakenException {
+    AuthData authData = authDAO.getAuth(authToken);
+    GameData game = gameDAO.getGame(gameID);
 
-        String whiteUsername = game.whiteUsername();
-        String blackUsername = game.blackUsername();
-        if (Objects.equals(color, "White")) {
-            if(whiteUsername != null && !whiteUsername.equals(authData.username()))
-                throw new DataAccessException("{ \"message\": \"Error: already taken\" }");
-            whiteUsername = authData.username();
+    if (game == null)
+        throw new BadRequestException("Game doesn't exist");
+    else if (color == null)
+        throw new BadRequestException("{ \"message\": \"Error: bad request\" }");
+    else if (Objects.equals(color, ChessGame.TeamColor.WHITE)) {
+        if(game.whiteUsername() != null)
+            throw new TakenException();
+        gameDAO.updateGame(new GameData(gameID, authData.username(), game.blackUsername(), game.gameName(), game.game()));
+    }
+    else if (Objects.equals(color, ChessGame.TeamColor.BLACK)) {
+        if (game.blackUsername() != null)
+            throw new TakenException();
+        gameDAO.updateGame(new GameData(gameID, game.whiteUsername(), authData.username(), game.gameName(), game.game()));
         }
-        else if (Objects.equals(color, "Black")) {
-            if (blackUsername != null && !blackUsername.equals(authData.username()))
-                throw new DataAccessException("{ \"message\": \"Error: already taken\" }");
-            blackUsername = authData.username();
-        }
-        try{
-            gameDAO.updateGame(new GameData(gameID, whiteUsername, blackUsername, game.gameName(), game.game()));
-        } catch (DataAccessException e){
-            throw new DataAccessException(" { \" message \": \" Error: bad request \"} ");
-        }
+    }
+
+    public void clear(){
+        gameDAO.clear();
     }
 }

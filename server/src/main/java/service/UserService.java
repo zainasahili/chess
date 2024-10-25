@@ -33,7 +33,6 @@ public class UserService {
     public AuthData loginUser(UserData user) throws DataAccessException {
         boolean authorized;
         AuthData authData;
-
         authorized = userDAO.authorized(user.username(), user.password());
 
         if (authorized){

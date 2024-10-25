@@ -10,7 +10,11 @@ import java.util.UUID;
 
 public class MemoryGame implements GameDAO{
 
-    HashSet<GameData> db = new HashSet<>();
+    HashSet<GameData> db;
+
+    public MemoryGame() {
+        db = HashSet.newHashSet(16);
+    }
 
 
     @Override
@@ -28,8 +32,9 @@ public class MemoryGame implements GameDAO{
     }
 
     @Override
-    public void updateGame(GameData game) throws DataAccessException{
-
+    public void updateGame(GameData game){
+        db.remove(getGame(game.gameID()));
+        db.add(game);
     }
 
 
@@ -45,6 +50,6 @@ public class MemoryGame implements GameDAO{
 
     @Override
     public void clear() {
-
+        db = new HashSet<>();
     }
 }

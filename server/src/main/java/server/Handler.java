@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -41,9 +42,8 @@ public class Handler {
         }
     }
 
-    public Object login(Request req, Response res) throws DataAccessException, BadRequestException{
+    public Object login(Request req, Response res) throws DataAccessException{
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
-
         AuthData authData = userService.loginUser(userData);
 
         if (authData != null) {
@@ -54,7 +54,7 @@ public class Handler {
         return ("{ \"message\": \"Error: unauthorized\" }");
     }
 
-    public Object logout(Request req, Response res) throws DataAccessException {
+    public Object logout(Request req, Response res) {
         String authToken = req.headers("authorization");
 
         try{
@@ -67,7 +67,7 @@ public class Handler {
         return "{}";
     }
 
-    public Object listGames(Request req, Response res) throws DataAccessException{
+    public Object listGames(Request req, Response res) {
         String authToken = req.headers("authorization");
         HashSet<GameData> games;
         try {
@@ -77,13 +77,12 @@ public class Handler {
             return ("{ \"message\": \"Error: unauthorized\" }");
         }
 
-        if (games.isEmpty())
-            return ("{ \"message\": \"There are no games\" }");
         res.status(200);
-        return new Gson().toJson(games);
+        String result = new Gson().toJson(games);
+        return "{\"games\": %s }".formatted(result);
     }
 
-    public Object createGame(Request req, Response res) throws DataAccessException{
+    public Object createGame(Request req, Response res){
         String authToken = req.headers("authorization");
         int gameID;
         GameData game = new Gson().fromJson(req.body(), GameData.class);
@@ -98,17 +97,31 @@ public class Handler {
         return "{ \"gameID\": %d }".formatted(gameID);
 
     }
-    public Object joinGame(Request req, Response res) throws DataAccessException{
+    public Object joinGame(Request req, Response res){
         String authToken = req.headers("authorization");
-        record JoinGame(String color, int gameID){};
+        record JoinGame(ChessGame.TeamColor playerColor, int gameID){};
         JoinGame game = new Gson().fromJson(req.body(), JoinGame.class);
 
         try{
-            gameService.joinGame(authToken, game.color(), game.gameID());
+            gameService.joinGame(authToken, game.playerColor(), game.gameID());
         } catch (DataAccessException e){
             res.status(401);
-            res.body("{ \"message\": \"Error: unauthorized\" }");
+            return ("{ \"message\": \"Error: unauthorized\" }");
+        } catch(BadRequestException e) {
+            res.status(400);
+            return("{ \"message\": \"Error: bad request\" }");
+        } catch (TakenException e){
+            res.status(403);
+            return ("{ \"message\": \"Error: already taken\" }");
         }
+
+        res.status(200);
+        return "{}";
+
+    }
+    public Object clear(Request req, Response res){
+        userService.clear();
+        gameService.clear();
 
         res.status(200);
         return "{}";

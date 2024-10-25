@@ -6,7 +6,11 @@ import java.util.HashSet;
 
 public class MemoryUser implements UserDAO{
 
-    HashSet<UserData> db = new HashSet<>();
+    HashSet<UserData> db;
+
+    public MemoryUser() {
+        db = HashSet.newHashSet(16);
+    }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
@@ -20,6 +24,7 @@ public class MemoryUser implements UserDAO{
     @Override
     public boolean authorized(String username, String password) {
         for (UserData user: db){
+            System.out.print(user);
             if (user.username().equals(username) && user.password().equals(password))
                 return true;
 

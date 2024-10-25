@@ -33,7 +33,7 @@ public class Server {
         Spark.get("/game", handler::listGames);
         Spark.post("/game", handler::createGame);
         Spark.put("/game", handler::joinGame);
-        Spark.delete("/db", this::clear);
+        Spark.delete("/db", handler::clear);
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -41,13 +41,6 @@ public class Server {
 
         Spark.awaitInitialization();
         return Spark.port();
-    }
-
-
-
-    private Object clear(Request req, Response res){
-        res.status(200);
-        return "{}";
     }
 
     public void stop() {
