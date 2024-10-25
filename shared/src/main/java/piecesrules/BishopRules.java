@@ -8,7 +8,6 @@ import chess.ChessMove;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static java.lang.Math.abs;
 
 
 public class BishopRules implements PiecesRules {
@@ -54,12 +53,6 @@ public class BishopRules implements PiecesRules {
             return true;
         }
         return false;
-    }
-    private boolean condition(int row, int column, ChessPosition myPosition){
-        return (row >= 1 && row <= 8 && column >= 1 && column <= 8
-                && (abs(row- myPosition.getRow()) == abs(column-myPosition.getColumn()))
-                && (row != myPosition.getRow()) && (column != myPosition.getColumn()));
-
     }
 }
 

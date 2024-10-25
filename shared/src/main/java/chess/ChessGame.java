@@ -110,8 +110,9 @@ public class ChessGame {
             }
 
         }
-        else
+        else {
             throw new InvalidMoveException("invalid move: " + move);
+        }
     }
 
     /**
@@ -185,7 +186,6 @@ public class ChessGame {
                     if (!moves.isEmpty()) {
                         return false;
                     }
-
 
                 }
             }

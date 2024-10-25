@@ -51,14 +51,15 @@ public class RookRules implements PiecesRules {
         return false;
     }
 
-    private boolean method(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, ChessGame.TeamColor color, ChessPosition newPosition) {
-        ChessPiece piece = board.getPiece(newPosition);
+    private boolean method(ChessBoard board, ChessPosition myPos, Collection<ChessMove> moves,
+                           ChessGame.TeamColor color, ChessPosition newPos) {
+        ChessPiece piece = board.getPiece(newPos);
         if (piece == null){
-            moves.add(new ChessMove(myPosition, newPosition, null));
+            moves.add(new ChessMove(myPos, newPos, null));
         }
         else{
             if (piece.getTeamColor() != color) {
-                moves.add(new ChessMove(myPosition, newPosition, null));
+                moves.add(new ChessMove(myPos, newPos, null));
             }
             return true;
         }

@@ -25,8 +25,9 @@ public class PawnRules implements PiecesRules {
             if (board.getPiece(newPosition) == null) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
             }
-            else
+            else {
                 blocked = true;
+            }
         }
 
         // if pawn is at starting line(2 steps)
