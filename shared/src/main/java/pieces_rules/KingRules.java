@@ -5,12 +5,11 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.ChessMove;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
 
-public class Kingrules implements Piecesrules{
+public class KingRules implements PiecesRules {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {

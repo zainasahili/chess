@@ -6,7 +6,7 @@ import chess.ChessPosition;
 
 import java.util.Collection;
 
-public interface Piecesrules {
+public interface PiecesRules {
 
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition);
 

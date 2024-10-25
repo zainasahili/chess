@@ -8,7 +8,7 @@ import java.util.Collection;
 import static java.lang.Math.abs;
 
 
-public class Knightrules implements Piecesrules{
+public class KnightRules implements PiecesRules {
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {

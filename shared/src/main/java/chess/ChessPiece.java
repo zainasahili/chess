@@ -2,7 +2,6 @@ package chess;
 
 import pieces_rules.*;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -72,12 +71,12 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
         return (switch (board.getPiece(myPosition).getPieceType()) {
-            case KING -> new Kingrules();
-            case QUEEN -> new Queenrules();
-            case BISHOP -> new Bishoprules();
-            case KNIGHT -> new Knightrules();
-            case ROOK -> new Rookrules();
-            case PAWN -> new Pawnrules();
+            case KING -> new KingRules();
+            case QUEEN -> new QueenRules();
+            case BISHOP -> new BishopRules();
+            case KNIGHT -> new KnightRules();
+            case ROOK -> new RookRules();
+            case PAWN -> new PawnRules();
 
         }).pieceMoves(board, myPosition);
 
