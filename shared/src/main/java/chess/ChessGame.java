@@ -12,11 +12,11 @@ import java.util.Objects;
  */
 public class ChessGame {
     private TeamColor teamTurn;
-    private ChessBoard Board;
+    private ChessBoard board;
 
     public ChessGame() {
-        Board = new ChessBoard();
-        Board.resetBoard();
+        board = new ChessBoard();
+        board.resetBoard();
         setTeamTurn(TeamColor.WHITE);
     }
 
@@ -58,20 +58,20 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> validMoves = new HashSet<>();
-        if (Board.getPiece(startPosition) != null){
+        if (board.getPiece(startPosition) != null){
 
-            Collection<ChessMove> all_moves = Board.getPiece(startPosition).pieceMoves(Board, startPosition);
-            TeamColor color = Board.getPiece(startPosition).getTeamColor();
-            ChessPiece piece = Board.getPiece(startPosition);
-            for (ChessMove move : all_moves) {
-                ChessPiece temporary = Board.getPiece(move.getEndPosition());
-                Board.addPiece(startPosition, null);
-                Board.addPiece(move.getEndPosition(), piece);
+            Collection<ChessMove> allMoves = board.getPiece(startPosition).pieceMoves(board, startPosition);
+            TeamColor color = board.getPiece(startPosition).getTeamColor();
+            ChessPiece piece = board.getPiece(startPosition);
+            for (ChessMove move : allMoves) {
+                ChessPiece temporary = board.getPiece(move.getEndPosition());
+                board.addPiece(startPosition, null);
+                board.addPiece(move.getEndPosition(), piece);
                 if (!isInCheck(color))
                     validMoves.add(move);
 
-                Board.addPiece(startPosition, piece);
-                Board.addPiece(move.getEndPosition(), temporary);
+                board.addPiece(startPosition, piece);
+                board.addPiece(move.getEndPosition(), temporary);
             }
         }
 
@@ -91,16 +91,16 @@ public class ChessGame {
             throw new InvalidMoveException("No valid moves");
         }
         else if (validmoves.contains(move) &&
-            Board.getPiece(move.getStartPosition()).getTeamColor() == teamTurn ) {
-            Board.addPiece(move.getEndPosition(), getBoard().getPiece(move.getStartPosition()));
+            board.getPiece(move.getStartPosition()).getTeamColor() == teamTurn ) {
+            board.addPiece(move.getEndPosition(), getBoard().getPiece(move.getStartPosition()));
 
             if (move.getPromotionPiece() != null){
                 ChessPiece it  = new ChessPiece(getBoard().getPiece(move.getStartPosition()).getTeamColor(),
                         move.getPromotionPiece());
-                Board.addPiece(move.getEndPosition(), it);
+                board.addPiece(move.getEndPosition(), it);
             }
 
-            Board.addPiece(move.getStartPosition(), null);
+            board.addPiece(move.getStartPosition(), null);
             if (getTeamTurn() == TeamColor.WHITE)
                 setTeamTurn(TeamColor.BLACK);
             else
@@ -121,21 +121,21 @@ public class ChessGame {
         ChessPosition king = null;
         for (int  i = 1; i <=8; i++) {
             for (int j = 1; j <= 8; j++) {
-                if (Board.getPiece(new ChessPosition(i, j)) != null &&
-                        Board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING
-                        && Board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
+                if (board.getPiece(new ChessPosition(i, j)) != null &&
+                        board.getPiece(new ChessPosition(i, j)).getPieceType() == ChessPiece.PieceType.KING
+                        && board.getPiece(new ChessPosition(i, j)).getTeamColor() == teamColor) {
                     king = new ChessPosition(i, j);
                 }
             }
         }
         for (int i = 1; i <= 8; i++){
             for(int j =1; j <=8; j++){
-                ChessPiece enemy = Board.getPiece(new ChessPosition(i, j));
+                ChessPiece enemy = board.getPiece(new ChessPosition(i, j));
                 if (enemy == null || enemy.getTeamColor() == teamColor)
                     continue;
 
-                Collection<ChessMove> enemy_moves = enemy.pieceMoves(Board, new ChessPosition(i, j));
-                for (ChessMove move: enemy_moves){
+                Collection<ChessMove> enemyMoves = enemy.pieceMoves(board, new ChessPosition(i, j));
+                for (ChessMove move: enemyMoves){
                     if (move.getEndPosition().equals(king)){
                         return true;
                     }
@@ -172,7 +172,7 @@ public class ChessGame {
         for (int x = 1; x <= 8; x++){
             for (int y = 1; y <= 8; y++){
                 ChessPosition position  = new ChessPosition(x,y);
-                ChessPiece piece = Board.getPiece(position);
+                ChessPiece piece = board.getPiece(position);
 
                 if (piece != null) {
                     if (piece.getTeamColor() == teamColor) {
@@ -195,7 +195,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        this.Board = board;
+        this.board = board;
     }
 
     /**
@@ -204,7 +204,7 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return Board;
+        return board;
     }
 
     @Override
@@ -212,19 +212,19 @@ public class ChessGame {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessGame chessGame = (ChessGame) o;
-        return teamTurn == chessGame.teamTurn && Objects.equals(Board, chessGame.Board);
+        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamTurn, Board);
+        return Objects.hash(teamTurn, board);
     }
 
     @Override
     public String toString() {
         return "ChessGame{" +
                 "teamTurn=" + teamTurn +
-                ", Board=" + Board +
+                ", Board=" + board +
                 '}';
     }
 }

@@ -1,4 +1,4 @@
-package pieces_rules;
+package piecesRules;
 
 import chess.*;
 
@@ -54,15 +54,15 @@ public class PawnRules implements PiecesRules {
 
     public Collection<ChessMove> captureEnemy(ChessBoard board, ChessPosition myPosition, int step, int row,
                                               ChessGame.TeamColor color, Collection<ChessMove> moves){
-        int col_right = myPosition.getColumn() + step;
-        int col_left = myPosition.getColumn() - step;
-        ChessPosition newPosition = new ChessPosition(row, col_right);
-        if (col_right >= 1 && col_right <= 8 && row >= 1 && row <= 8) {
+        int colRight = myPosition.getColumn() + step;
+        int colLeft = myPosition.getColumn() - step;
+        ChessPosition newPosition = new ChessPosition(row, colRight);
+        if (colRight >= 1 && colRight <= 8 && row >= 1 && row <= 8) {
             if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
                 moves.add(new ChessMove(myPosition, newPosition, null));
         }
-        if (col_left >= 1 && col_left <= 8 && row >= 1 && row <= 8) {
-            newPosition = new ChessPosition(row, col_left);
+        if (colLeft >= 1 && colLeft <= 8 && row >= 1 && row <= 8) {
+            newPosition = new ChessPosition(row, colLeft);
             if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
                 moves.add(new ChessMove(myPosition, newPosition, null));
         }

@@ -1,4 +1,4 @@
-package pieces_rules;
+package piecesRules;
 
 import chess.*;
 
