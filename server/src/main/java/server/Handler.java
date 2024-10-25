@@ -87,7 +87,7 @@ public class Handler {
         int gameID;
         GameData game = new Gson().fromJson(req.body(), GameData.class);
         try{
-            gameID = gameService.createGame(authToken, game);
+            gameID = gameService.createGame(authToken, game.gameName());
         } catch (DataAccessException e){
             res.status(401);
             return ("{ \"message\": \"Error: unauthorized\" }");

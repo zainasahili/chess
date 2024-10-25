@@ -25,11 +25,11 @@ public class GameService {
         return gameDAO.getGames();
     }
 
-    public int createGame(String authToken, GameData game) throws DataAccessException {
+    public int createGame(String authToken, String name) throws DataAccessException {
         authDAO.getAuth(authToken);
         int gameID = new Random().nextInt(1000);
 
-        return gameDAO.create(new GameData(gameID, null, null, game.gameName(), new ChessGame()));
+        return gameDAO.create(new GameData(gameID, null, null, name, new ChessGame()));
     }
 
     public void joinGame(String authToken, ChessGame.TeamColor color, int gameID) throws DataAccessException, BadRequestException, TakenException {
@@ -38,14 +38,14 @@ public class GameService {
 
     if (game == null)
         throw new BadRequestException("Game doesn't exist");
-    else if (color == null)
+    else if (color != ChessGame.TeamColor.BLACK && color != ChessGame.TeamColor.WHITE)
         throw new BadRequestException("{ \"message\": \"Error: bad request\" }");
     else if (Objects.equals(color, ChessGame.TeamColor.WHITE)) {
         if(game.whiteUsername() != null)
             throw new TakenException();
         gameDAO.updateGame(new GameData(gameID, authData.username(), game.blackUsername(), game.gameName(), game.game()));
     }
-    else if (Objects.equals(color, ChessGame.TeamColor.BLACK)) {
+    else {
         if (game.blackUsername() != null)
             throw new TakenException();
         gameDAO.updateGame(new GameData(gameID, game.whiteUsername(), authData.username(), game.gameName(), game.game()));
