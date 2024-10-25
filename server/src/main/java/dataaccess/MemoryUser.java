@@ -13,10 +13,10 @@ public class MemoryUser implements UserDAO{
     }
 
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public void getUser(String username) throws DataAccessException {
         for (UserData user: db){
             if (user.username().equals(username))
-                return user;
+                return;
         }
         throw new DataAccessException("user not found" + username);
     }

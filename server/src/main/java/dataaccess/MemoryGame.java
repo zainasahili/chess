@@ -4,9 +4,7 @@ import model.GameData;
 
 
 import java.util.HashSet;
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
+
 
 public class MemoryGame implements GameDAO{
 

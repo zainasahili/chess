@@ -24,7 +24,7 @@ public class Handler {
         Handler.gameService = gameService;
     }
 
-    public Object register(Request req, Response res) throws DataAccessException {
+    public Object register(Request req, Response res){
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
 
         if (userData.username() == null || userData.password() == null) {
@@ -99,7 +99,7 @@ public class Handler {
     }
     public Object joinGame(Request req, Response res){
         String authToken = req.headers("authorization");
-        record JoinGame(ChessGame.TeamColor playerColor, int gameID){};
+        record JoinGame(ChessGame.TeamColor playerColor, int gameID){}
         JoinGame game = new Gson().fromJson(req.body(), JoinGame.class);
 
         try{
