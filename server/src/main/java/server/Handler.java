@@ -46,13 +46,21 @@ public class Handler {
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
         AuthData authData = userService.loginUser(userData);
 
-        if (authData != null) {
+        try {
+            userService.loginUser(userData);
+        } catch (DataAccessException e) {
+            res.status(401);
+            return ("{ \"message\": \"Error: unauthorized\" }");
+        }
+        if (authData != null){
             res.status(200);
             return new Gson().toJson(authData);
         }
+
         res.status(401);
         return ("{ \"message\": \"Error: unauthorized\" }");
     }
+
 
     public Object logout(Request req, Response res) {
         String authToken = req.headers("authorization");

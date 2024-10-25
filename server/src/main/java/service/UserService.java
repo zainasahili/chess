@@ -33,6 +33,7 @@ public class UserService {
     public AuthData loginUser(UserData user) throws DataAccessException {
         boolean authorized;
         AuthData authData;
+
         authorized = userDAO.authorized(user.username(), user.password());
 
         if (authorized){
@@ -45,7 +46,11 @@ public class UserService {
 
     }
     public void logoutUser(String authToken) throws DataAccessException{
-        authDAO.getAuth(authToken);
+        try {
+            authDAO.getAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
         authDAO.deleteAuth(authToken);
     }
 
