@@ -36,18 +36,22 @@ public class GameService {
     AuthData authData = authDAO.getAuth(authToken);
     GameData game = gameDAO.getGame(gameID);
 
-    if (game == null)
+    if (game == null) {
         throw new BadRequestException("Game doesn't exist");
-    else if (color != ChessGame.TeamColor.BLACK && color != ChessGame.TeamColor.WHITE)
+    }
+    else if (color != ChessGame.TeamColor.BLACK && color != ChessGame.TeamColor.WHITE) {
         throw new BadRequestException("{ \"message\": \"Error: bad request\" }");
+    }
     else if (Objects.equals(color, ChessGame.TeamColor.WHITE)) {
-        if(game.whiteUsername() != null)
+        if(game.whiteUsername() != null) {
             throw new TakenException();
+        }
         gameDAO.updateGame(new GameData(gameID, authData.username(), game.blackUsername(), game.gameName(), game.game()));
     }
     else {
-        if (game.blackUsername() != null)
+        if (game.blackUsername() != null) {
             throw new TakenException();
+        }
         gameDAO.updateGame(new GameData(gameID, game.whiteUsername(), authData.username(), game.gameName(), game.game()));
         }
     }

@@ -1,4 +1,4 @@
-package piecesRules;
+package piecesrules;
 
 import chess.*;
 
@@ -16,19 +16,27 @@ public class RookRules implements PiecesRules {
 
         //right
         for (int i = 1; i <= 7; i++){
-            if (leftRight(board, myPosition, moves, color, i)) break;
+            if (leftRight(board, myPosition, moves, color, i)) {
+                break;
+            }
         }
         //left
         for (int i = -1; i >= -7; i--){
-            if (leftRight(board, myPosition, moves, color, i)) break;
+            if (leftRight(board, myPosition, moves, color, i)) {
+                break;
+            }
         }
         //backward
         for (int i = -1; i >= -7; i--){
-            if (forwardBackward(board, myPosition, moves, color, i)) break;
+            if (forwardBackward(board, myPosition, moves, color, i)) {
+                break;
+            }
         }
         //forward
         for (int i = 1; i <= 7; i++){
-            if (forwardBackward(board, myPosition, moves, color, i)) break;
+            if (forwardBackward(board, myPosition, moves, color, i)) {
+                break;
+            }
         }
 
         return moves;
@@ -38,14 +46,21 @@ public class RookRules implements PiecesRules {
         int col = myPosition.getColumn() + i;
         if (col >= 1 && col <= 8 ){
             ChessPosition newPosition = new ChessPosition(myPosition.getRow(), col);
-            ChessPiece piece = board.getPiece(newPosition);
-            if (piece == null)
+            return method(board, myPosition, moves, color, newPosition);
+        }
+        return false;
+    }
+
+    private boolean method(ChessBoard board, ChessPosition myPosition, Collection<ChessMove> moves, ChessGame.TeamColor color, ChessPosition newPosition) {
+        ChessPiece piece = board.getPiece(newPosition);
+        if (piece == null){
+            moves.add(new ChessMove(myPosition, newPosition, null));
+        }
+        else{
+            if (piece.getTeamColor() != color) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
-            else{
-                if (piece.getTeamColor() != color)
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -54,14 +69,7 @@ public class RookRules implements PiecesRules {
         int row = myPosition.getRow() + i;
         if (row >= 1 && row <= 8 ){
             ChessPosition newPosition = new ChessPosition(row, myPosition.getColumn());
-            ChessPiece piece = board.getPiece(newPosition);
-            if (piece == null)
-                moves.add(new ChessMove(myPosition, newPosition, null));
-            else{
-                if (piece.getTeamColor() != color)
-                    moves.add(new ChessMove(myPosition, newPosition, null));
-                return true;
-            }
+            return method(board, myPosition, moves, color, newPosition);
         }
         return false;
     }

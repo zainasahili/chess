@@ -1,4 +1,4 @@
-package piecesRules;
+package piecesrules;
 
 import chess.*;
 
@@ -22,8 +22,9 @@ public class PawnRules implements PiecesRules {
         if (myPosition.getRow() >= 2 && myPosition.getRow() <= 8 &&
                 myPosition.getColumn() >= 1 && myPosition.getColumn() <= 8){
             ChessPosition newPosition = new ChessPosition(row, myPosition.getColumn());
-            if (board.getPiece(newPosition) == null)
+            if (board.getPiece(newPosition) == null) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
+            }
             else
                 blocked = true;
         }
@@ -35,8 +36,9 @@ public class PawnRules implements PiecesRules {
         moves.addAll(captureEnemy(board, myPosition, step, row, color, moves));
 
         // if pawn is at then edge of the board
-        if (row == 1 || row == 8)
+        if (row == 1 || row == 8) {
             return promotion(moves, row);
+        }
         return moves;
     }
 
@@ -45,8 +47,9 @@ public class PawnRules implements PiecesRules {
         if (!blocked && ((color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7)
                 || (color == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2))) {
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() + (2 * step), myPosition.getColumn());
-            if (board.getPiece(newPosition) == null)
+            if (board.getPiece(newPosition) == null) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
+            }
 
         }
         return moves;
@@ -58,13 +61,15 @@ public class PawnRules implements PiecesRules {
         int colLeft = myPosition.getColumn() - step;
         ChessPosition newPosition = new ChessPosition(row, colRight);
         if (colRight >= 1 && colRight <= 8 && row >= 1 && row <= 8) {
-            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
+            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
+            }
         }
         if (colLeft >= 1 && colLeft <= 8 && row >= 1 && row <= 8) {
             newPosition = new ChessPosition(row, colLeft);
-            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color)
+            if (board.getPiece(newPosition) != null && board.getPiece(newPosition).getTeamColor() != color) {
                 moves.add(new ChessMove(myPosition, newPosition, null));
+            }
         }
         return moves;
     }

@@ -23,9 +23,11 @@ public class MemoryGame implements GameDAO{
 
     @Override
     public GameData getGame(int gameID) {
-        for (GameData data: db)
-            if (data.gameID() == gameID)
+        for (GameData data: db) {
+            if (data.gameID() == gameID) {
                 return data;
+            }
+        }
         return null;
     }
 
@@ -38,8 +40,9 @@ public class MemoryGame implements GameDAO{
 
     @Override
     public int create(GameData game) throws DataAccessException{
-        if (getGame(game.gameID()) != null)
+        if (getGame(game.gameID()) != null) {
             throw new DataAccessException("game already created");
+        }
 
         db.add(game);
         return game.gameID();
