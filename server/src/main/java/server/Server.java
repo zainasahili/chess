@@ -11,11 +11,11 @@ import java.util.HashSet;
 
 public class Server {
 
-    HashSet<AuthData> db = new HashSet<>();
+//    HashSet<AuthData> db = new HashSet<>();
 
     UserDAO userDAO = new SQLUser();
     GameDAO gameDAO = new MemoryGame();
-    AuthDAO authDAO = new MemoryAuth();
+    AuthDAO authDAO = new SQLAuth();
 
     UserService userService = new UserService(userDAO, authDAO);
     GameService gameService = new GameService(gameDAO, authDAO);
