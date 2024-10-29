@@ -19,7 +19,7 @@ class GameServiceTest {
     static AuthData authData;
 
     @BeforeAll
-    static void init(){
+    static void init() throws DataAccessException {
         gameDAO = new MemoryGame();
         authDAO = new MemoryAuth();
         gameService = new GameService(gameDAO, authDAO);

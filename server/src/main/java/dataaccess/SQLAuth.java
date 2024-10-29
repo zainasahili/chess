@@ -1,7 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
+
 
 import java.sql.SQLException;
 
@@ -16,8 +16,8 @@ public class SQLAuth implements AuthDAO{
         try (var conn = DatabaseManager.getConnection()){
             var createTable = """
                     CREATE TABLE if NOT EXISTS auth(
-                            username VARCHAR(255) NOT NULL,
                             authToken VARCHAR(255) NOT NULL,
+                            username VARCHAR(255) NOT NULL,
                             PRIMARY KEY (authToken)
                     )""";
             try (var statement = conn.prepareStatement(createTable)){
@@ -45,28 +45,30 @@ public class SQLAuth implements AuthDAO{
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
         try (var conn =  DatabaseManager.getConnection()){
-            try (var statement = conn.prepareStatement("SELECT username, authToken FROM auth WHERE authToken=?")) {
+            try (var statement = conn.prepareStatement("SELECT authToken, username FROM auth WHERE authToken=?")) {
                 statement.setString(1, authToken);
                 try (var result = statement.executeQuery()) {
                     result.next();
                     var username = result.getString(2);
-                    return new AuthData(username, authToken);
+                    return new AuthData(authToken, username);
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("authToken not found" + authToken);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public void add(AuthData data) {
+    public void add(AuthData data) throws DataAccessException {
         try (var conn =  DatabaseManager.getConnection()){
             try (var statement = conn.prepareStatement("INSERT INTO auth (username, authToken) VALUES(?,?)")) {
-                statement.setString(1, data.authToken());
-                statement.setString(2, data.username());
+                statement.setString(1, data.username());
+                statement.setString(2, data.authToken());
                 statement.executeUpdate();
             }
-        } catch (SQLException | DataAccessException e) {}
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
