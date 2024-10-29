@@ -52,8 +52,7 @@ public class SQLUser implements UserDAO{
     @Override
     public boolean authorized(String username, String password) throws DataAccessException{
         UserData user = getUser(username);
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        return hashedPassword.equals(user.password());
+        return BCrypt.checkpw(password, user.password());
 
     }
 
@@ -75,7 +74,7 @@ public class SQLUser implements UserDAO{
     @Override
     public void clear() {
         try (var conn = DatabaseManager.getConnection()){
-            try(var statement = conn.prepareStatement("Truncate user ")){
+            try(var statement = conn.prepareStatement("TRUNCATE user ")){
                 statement.executeUpdate();
             }
         } catch (SQLException | DataAccessException e){

@@ -13,13 +13,14 @@ public class Server {
 
     HashSet<AuthData> db = new HashSet<>();
 
-    UserDAO userDAO = new MemoryUser();
+    UserDAO userDAO = new SQLUser();
     GameDAO gameDAO = new MemoryGame();
     AuthDAO authDAO = new MemoryAuth();
 
     UserService userService = new UserService(userDAO, authDAO);
     GameService gameService = new GameService(gameDAO, authDAO);
     Handler handler = new Handler(userService, gameService);
+
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
