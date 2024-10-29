@@ -3,8 +3,10 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/server/src/main/java/dataaccess/DatabaseManager.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/server/src/main/java/dataaccess/SQLAuth.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/server/src/main/java/dataaccess/SQLGame.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/server/src/main/java/dataaccess/SQLUser.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/server/src/test/java/dataaccess/SQLAuthTest.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/server/src/test/java/dataaccess/SQLGameTest.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/server/src/test/java/dataaccess/SQLUserTest.java" dialect="GenericSQL" />
   </component>
 </project>
