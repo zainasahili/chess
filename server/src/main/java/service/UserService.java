@@ -36,14 +36,15 @@ public class UserService {
 
         authorized = userDAO.authorized(user.username(), user.password());
 
-        if (authorized){
+
+        if (authorized) {
             String authToken = UUID.randomUUID().toString();
             authData = new AuthData(authToken, user.username());
             authDAO.add(authData);
             return authData;
         }
-        return null;
 
+        return null;
     }
     public void logoutUser(String authToken) throws DataAccessException{
         try {

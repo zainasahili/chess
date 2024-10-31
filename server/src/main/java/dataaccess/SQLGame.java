@@ -23,7 +23,7 @@ public class SQLGame implements GameDAO{
                             whiteUsername VARCHAR(255),
                             blackUsername VARCHAR(255),
                             gameName VARCHAR(255),
-                            chessGame TEXT;
+                            chessGame TEXT,
                             PRIMARY KEY (gameID)
                     )""";
             try (var statement = conn.prepareStatement(createTable)){
@@ -67,7 +67,7 @@ public class SQLGame implements GameDAO{
                     statement.setString(2, game.whiteUsername());
                     statement.setString(3, game.blackUsername());
                     statement.setString(4, game.gameName());
-                    statement.setString(5, new Gson().toJson(game, ChessGame.class));
+                    statement.setString(5, new Gson().toJson(game.game(), ChessGame.class));
                     statement.executeUpdate();
 
             }
@@ -78,17 +78,52 @@ public class SQLGame implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) {
-        return null;
+    public GameData getGame(int gameID) throws DataAccessException {
+        try (var conn =  DatabaseManager.getConnection()){
+            try (var statement = conn.prepareStatement(
+                    "SELECT whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID=?")) {
+                statement.setInt(1, gameID);
+                try (var result = statement.executeQuery()) {
+                    result.next();
+                    var whiteUsername = result.getString(1);
+                    var blackUsername = result.getString(2);
+                    var gameName = result.getString(3);
+                    var chessGame = new Gson().fromJson(result.getString("chessGame"), ChessGame.class);
+                    return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
+        try (var conn =  DatabaseManager.getConnection()){
+            try (var statement = conn.prepareStatement(
+                    "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, chessGame=? WHERE gameID=?")) {
+                statement.setString(1, game.whiteUsername());
+                statement.setString(2, game.blackUsername());
+                statement.setString(3, game.gameName());
+                statement.setString(4, new Gson().toJson(game.game(), ChessGame.class));
+                statement.setInt(5, game.gameID());
+                if (statement.executeUpdate() == 0)
+                    throw new DataAccessException("game to be updated not found");
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
+        }
 
     }
 
     @Override
     public void clear() {
-
+        try (var conn = DatabaseManager.getConnection()){
+            try(var statement = conn.prepareStatement("TRUNCATE game ")){
+                statement.executeUpdate();
+            }
+        } catch (SQLException | DataAccessException e){
+            throw new RuntimeException();
+        }
     }
 }

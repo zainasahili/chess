@@ -14,7 +14,7 @@ public class Server {
 //    HashSet<AuthData> db = new HashSet<>();
 
     UserDAO userDAO = new SQLUser();
-    GameDAO gameDAO = new MemoryGame();
+    GameDAO gameDAO = new SQLGame();
     AuthDAO authDAO = new SQLAuth();
 
     UserService userService = new UserService(userDAO, authDAO);

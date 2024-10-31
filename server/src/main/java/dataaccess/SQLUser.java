@@ -45,7 +45,7 @@ public class SQLUser implements UserDAO{
                     }
                 }
             } catch (SQLException e) {
-                throw new DataAccessException("user not found" + username);
+                throw new DataAccessException("{ \"message\": \"Error: invalid user\" }");
             }
     }
 

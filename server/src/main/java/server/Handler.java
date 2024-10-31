@@ -44,10 +44,10 @@ public class Handler {
 
     public Object login(Request req, Response res) throws DataAccessException{
         UserData userData = new Gson().fromJson(req.body(), UserData.class);
-        AuthData authData = userService.loginUser(userData);
+        AuthData authData;
 
         try {
-            userService.loginUser(userData);
+            authData = userService.loginUser(userData);
         } catch (DataAccessException e) {
             res.status(401);
             return ("{ \"message\": \"Error: unauthorized\" }");
