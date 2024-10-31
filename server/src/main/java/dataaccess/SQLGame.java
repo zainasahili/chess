@@ -80,13 +80,13 @@ public class SQLGame implements GameDAO{
     public GameData getGame(int gameID) throws DataAccessException, BadRequestException {
         try (var conn =  DatabaseManager.getConnection()){
             try (var statement = conn.prepareStatement(
-                    "SELECT gameID, whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID=?")) {
+                    "SELECT whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID=?")) {
                 statement.setInt(1, gameID);
                 try (var result = statement.executeQuery()) {
                     result.next();
-                    var whiteUsername = result.getString(2);
-                    var blackUsername = result.getString(3);
-                    var gameName = result.getString(4);
+                    var whiteUsername = result.getString(1);
+                    var blackUsername = result.getString(2);
+                    var gameName = result.getString(3);
                     var chessGame = new Gson().fromJson(result.getString("chessGame"), ChessGame.class);
                     return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
                 }

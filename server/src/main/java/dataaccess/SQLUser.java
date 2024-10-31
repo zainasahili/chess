@@ -45,7 +45,7 @@ public class SQLUser implements UserDAO{
                     }
                 }
             } catch (SQLException e) {
-                throw new DataAccessException("{ \"message\": \"Error: invalid user\" }");
+                throw new DataAccessException(e.getMessage());
             }
     }
 
@@ -67,7 +67,7 @@ public class SQLUser implements UserDAO{
                 statement.executeUpdate();
             }
         } catch (SQLException e){
-            throw new DataAccessException("User already exists");
+            throw new DataAccessException(e.getMessage());
         }
     }
 
