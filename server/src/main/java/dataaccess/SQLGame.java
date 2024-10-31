@@ -78,7 +78,7 @@ public class SQLGame implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(int gameID) throws DataAccessException, BadRequestException {
         try (var conn =  DatabaseManager.getConnection()){
             try (var statement = conn.prepareStatement(
                     "SELECT whiteUsername, blackUsername, gameName, chessGame FROM game WHERE gameID=?")) {
@@ -92,7 +92,9 @@ public class SQLGame implements GameDAO{
                     return new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame);
                 }
             }
-        } catch (SQLException | DataAccessException e) {
+        } catch (SQLException e){
+            throw new BadRequestException(e.getMessage());
+        } catch (DataAccessException e ) {
             throw new DataAccessException(e.getMessage());
         }
     }

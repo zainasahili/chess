@@ -90,7 +90,7 @@ class SQLGameTest {
     }
 
     @Test
-    void validGetGame() throws DataAccessException {
+    void validGetGame() throws DataAccessException, BadRequestException {
         gameDAO.create(gameData);
         Assertions.assertEquals(gameData, gameDAO.getGame(gameData.gameID()));
 
@@ -102,7 +102,7 @@ class SQLGameTest {
     }
 
     @Test
-    void validUpdateGame() throws DataAccessException {
+    void validUpdateGame() throws DataAccessException, BadRequestException {
         gameDAO.create(gameData);
         GameData newGame = new GameData(gameData.gameID(), "stop", "start", gameData.gameName(), new ChessGame());
         gameDAO.updateGame(newGame);

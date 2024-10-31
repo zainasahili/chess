@@ -55,7 +55,7 @@ class GameServiceTest {
 
     @Test
     @DisplayName("Valid Create")
-    void validCreateGame() throws DataAccessException {
+    void validCreateGame() throws DataAccessException, BadRequestException {
         int game1 = gameService.createGame(authData.authToken(), "name");
         assertNotEquals(null, gameDAO.getGame(game1));
 
