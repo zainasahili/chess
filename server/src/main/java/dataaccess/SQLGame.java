@@ -108,8 +108,9 @@ public class SQLGame implements GameDAO{
                 statement.setString(3, game.gameName());
                 statement.setString(4, new Gson().toJson(game.game(), ChessGame.class));
                 statement.setInt(5, game.gameID());
-                if (statement.executeUpdate() == 0)
+                if (statement.executeUpdate() == 0) {
                     throw new DataAccessException("game to be updated not found");
+                }
             }
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());

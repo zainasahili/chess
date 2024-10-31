@@ -36,18 +36,11 @@ class SQLAuthTest {
     }
 
     @Test
-    void validDeleteAuth() throws DataAccessException, SQLException {
+    void validDeleteAuth() throws DataAccessException{
         authDAO.add(auth);
         authDAO.deleteAuth(auth.authToken());
 
-        try (var conn =  DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT authToken, username FROM auth WHERE authToken=?")) {
-                statement.setString(1, auth.authToken());
-                try (var result = statement.executeQuery()) {
-                    Assertions.assertFalse(result.next());
-                }
-            }
-        }
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.getAuth(auth.authToken()));
     }
 
     @Test
