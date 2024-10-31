@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -98,7 +97,7 @@ class SQLGameTest {
 
     @Test
     void invalidGetGame() {
-        Assertions.assertThrows(DataAccessException.class, ()-> gameDAO.getGame(gameData.gameID()));
+        Assertions.assertThrows(BadRequestException.class, ()-> gameDAO.getGame(gameData.gameID()));
     }
 
     @Test
