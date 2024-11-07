@@ -2,7 +2,6 @@ package ui;
 
 import client.ServerFacade;
 
-import java.util.Objects;
 import java.util.Scanner;
 
 public class PreLogin {
@@ -17,26 +16,51 @@ public class PreLogin {
 
     public void run(){
         boolean loggedIn = false;
-        System.out.print("Welcome to 240 chess. Type Help to get started.");
+        System.out.println("Welcome to 240 chess. Type Help to get started.");
 
+        label:
         while (!loggedIn) {
             String[] input = getInput();
-            String function = input[0];
-            if (Objects.equals(function, "help")){
-                help();
-                break;
+            String command = input[0];
+            switch (command) {
+                case "help":
+                    helpMenu();
+                    break label;
+                case "quit":
+                    return;
+                case "login":
+                    if (input.length != 3) {
+                        System.out.println("please provide a username and password");
+                        System.out.println("login <USERNAME> <PASSWORD> - login with an existing user");
+                    } else if (server.login()) {
+                        System.out.printf("Logged in as %s\n", input[1]);
+                        loggedIn = true;
+                        break;
+                    } else {
+                        System.out.println("Invalid username/password");
+                    }
+                case "register":
+                    if (input.length != 4) {
+                        System.out.println("please provide a username, password, and an email");
+                        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
+                    } else if (server.register()) {
+                        server.login();
+                        System.out.printf("Logged in as %s\n", input[1]);
+                        loggedIn = true;
+                        break ;
+                    } else {
+                        System.out.println("Username already in use");
+                        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
+                        break;
+                    }
+
+                case null:
+                default:
+                    System.out.println("Command not recognized");
+                    helpMenu();
+                    break;
             }
-            else if (Objects.equals(function, "quit")){
-                return;
-            }
-            else if (Objects.equals(function, "login")){
-                login();
-                break;
-            }
-            else if (Objects.equals(function, "register")){
-                register();
-                break;
-            }
+
         }
 
     }
@@ -47,16 +71,12 @@ public class PreLogin {
         return scanner.nextLine().split(" ");
     }
 
-    public String help(){
-        return null;
+    public void helpMenu(){
+        System.out.println("register «USERNAME> «PASSWORD> «EMAIL> - to create an account");
+        System.out.println("login <USERNAME> <PASSWORD> - to play chess");
+        System.out.println("quit - playing chess");
+        System.out.println("help - with possible commands");
     }
 
-    public boolean login(){
-        return true;
-    }
-
-    public boolean register(){
-        return true;
-    }
 
 }
