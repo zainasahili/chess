@@ -26,7 +26,7 @@ public class ServerFacade {
 
     }
 
-    public boolean createGame(){
+    public boolean createGame(String name){
         return true;
     }
 

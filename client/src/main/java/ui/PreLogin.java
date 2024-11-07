@@ -18,14 +18,13 @@ public class PreLogin {
         boolean loggedIn = false;
         System.out.println("Welcome to 240 chess. Type Help to get started.");
 
-        label:
         while (!loggedIn) {
             String[] input = getInput();
             String command = input[0];
             switch (command) {
                 case "help":
                     helpMenu();
-                    break label;
+                    break;
                 case "quit":
                     return;
                 case "login":
@@ -35,10 +34,10 @@ public class PreLogin {
                     } else if (server.login()) {
                         System.out.printf("Logged in as %s\n", input[1]);
                         loggedIn = true;
-                        break;
                     } else {
                         System.out.println("Invalid username/password");
                     }
+                    break;
                 case "register":
                     if (input.length != 4) {
                         System.out.println("please provide a username, password, and an email");
@@ -47,13 +46,11 @@ public class PreLogin {
                         server.login();
                         System.out.printf("Logged in as %s\n", input[1]);
                         loggedIn = true;
-                        break ;
                     } else {
                         System.out.println("Username already in use");
                         System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-                        break;
                     }
-
+                    break;
                 case null:
                 default:
                     System.out.println("Command not recognized");
@@ -62,6 +59,7 @@ public class PreLogin {
             }
 
         }
+        postLogin.run();
 
     }
 
