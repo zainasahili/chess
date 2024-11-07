@@ -8,8 +8,8 @@ import java.util.HashSet;
 public class ServerFacade {
     private final String url;
 
-    public ServerFacade(String url) {
-        this.url = url;
+    public ServerFacade() {
+        url = "localhost:8080";
     }
 
 

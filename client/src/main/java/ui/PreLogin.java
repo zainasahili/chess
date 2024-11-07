@@ -51,7 +51,6 @@ public class PreLogin {
                         System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
                     }
                     break;
-                case null:
                 default:
                     System.out.println("Command not recognized");
                     helpMenu();
