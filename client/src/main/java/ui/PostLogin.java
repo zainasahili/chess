@@ -30,7 +30,7 @@ public class PostLogin {
                         System.out.println("Choose a name for the game");
                         System.out.println("create ‹NAME>");
                     } else if (server.createGame(input[1])){
-                        System.out.printf("%s game create\n", input[1]);
+                        System.out.printf("%s game created\n", input[1]);
                     }
                     break;
                 case "list":

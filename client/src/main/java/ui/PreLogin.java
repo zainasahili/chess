@@ -31,7 +31,7 @@ public class PreLogin {
                     if (input.length != 3) {
                         System.out.println("please provide a username and password");
                         System.out.println("login <USERNAME> <PASSWORD> - login with an existing user");
-                    } else if (server.login()) {
+                    } else if (server.login(input[1], input[2])) {
                         System.out.printf("Logged in as %s\n", input[1]);
                         loggedIn = true;
                     } else {
@@ -42,8 +42,8 @@ public class PreLogin {
                     if (input.length != 4) {
                         System.out.println("please provide a username, password, and an email");
                         System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-                    } else if (server.register()) {
-                        server.login();
+                    } else if (server.register(input[1], input[2], input[3])) {
+                        server.login(input[1], input[2]);
                         System.out.printf("Logged in as %s\n", input[1]);
                         loggedIn = true;
                     } else {
