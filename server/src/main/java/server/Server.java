@@ -44,6 +44,12 @@ public class Server {
         return Spark.port();
     }
 
+    public void clear(){
+        userDAO.clear();
+        authDAO.clear();
+        gameDAO.clear();
+    }
+
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
