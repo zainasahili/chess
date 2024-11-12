@@ -78,7 +78,6 @@ public class PostLogin {
         System.out.println("join <ID> [WHITE|BLACK] - a game");
         System.out.println("observe ‹ID> - a game");
         System.out.println("logout - when you are done");
-        System.out.println("quit - playing chess");
         System.out.println("help - with possible commands");
     }
 
