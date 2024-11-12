@@ -17,9 +17,16 @@ import java.util.Objects;
 
 public class ServerFacade {
     private final String url;
+    String authToken;
 
     public ServerFacade(String serverDomain) {
        url = "http://" + serverDomain;
+    }
+    private String getAuthToken(){
+        return authToken;
+    }
+    private void setAuthToken(String authToken){
+        this.authToken = authToken;
     }
 
     private Map request(String method, String endpoint, String body){
@@ -41,6 +48,9 @@ public class ServerFacade {
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
 
+        if (getAuthToken() != null){
+            http.addRequestProperty("authorization", getAuthToken());
+        }
 
         if (!Objects.equals(body, null)){
             http.setDoOutput(true);
@@ -55,17 +65,34 @@ public class ServerFacade {
     public boolean register(String username, String password, String email){
         var body = Map.of("username", username, "password", password, "email", email);
         var jsonBody = new Gson().toJson(body);
-        return !request("POST", "/user", jsonBody).containsKey("Error");
+        Map response = request("POST", "/user", jsonBody);
+        if (response.containsKey("Error")){
+            return false;
+        }
+
+        setAuthToken((String) response.get("authToken"));
+        return true;
     }
 
     public boolean login(String username, String password){
         var body = Map.of("username", username, "password", password);
         var jsonBody = new Gson().toJson(body);
-        return !request("POST", "/session", jsonBody).containsKey("Error");
+        Map response = request("POST", "/session", jsonBody);
+        if (response.containsKey("Error")){
+            return false;
+        }
+
+        setAuthToken((String) response.get("authToken"));
+        return true;
     }
 
-    public void logout(){
-        request("DELETE", "/session", null);
+    public boolean logout(){
+        Map response = request("DELETE", "/session", null);
+        if (response.containsKey("Error")){
+            return false;
+        }
+        setAuthToken(null);
+        return true;
     }
 
     public boolean createGame(String name){

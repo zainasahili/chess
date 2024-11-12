@@ -57,4 +57,16 @@ public class ServerFacadeTests {
         Assertions.assertFalse(facade.login("username", "password"));
     }
 
+    @Test
+    public void validLogout(){
+        facade.register("username", "password", "email");
+        facade.login("username", "password");
+        Assertions.assertTrue(facade.logout());
+    }
+
+    @Test
+    public void invalidLogout(){
+        Assertions.assertFalse(facade.logout());
+    }
+
 }

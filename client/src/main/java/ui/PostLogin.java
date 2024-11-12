@@ -22,8 +22,8 @@ public class PostLogin {
                     helpMenu();
                     break;
                 case "logout":
-                    server.logout();
-                    loggedIn = false;
+                    if (server.logout()){
+                    loggedIn = false;}
                     break;
                 case "create":
                     if (input.length != 2){
