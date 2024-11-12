@@ -20,7 +20,7 @@ public class ServerFacade {
     private final String url;
 
     public ServerFacade(String serverDomain) {
-       url = "http://" + serverDomain;
+       url = "https://" + serverDomain;
     }
 
     private Map request(String method, String endpoint, String body){

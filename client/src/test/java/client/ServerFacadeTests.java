@@ -46,7 +46,10 @@ public class ServerFacadeTests {
         Assertions.assertFalse(facade.register("username", "password", "email"));
     }
 
+    @Test
+    public void validLogin(){
 
+    }
 
 
 }
