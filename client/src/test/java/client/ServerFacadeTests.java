@@ -48,8 +48,13 @@ public class ServerFacadeTests {
 
     @Test
     public void validLogin(){
-
+        facade.register("username", "password", "email");
+        Assertions.assertTrue(facade.login("username", "password"));
     }
 
+    @Test
+    public void invalidLogin(){
+        Assertions.assertFalse(facade.login("username", "password"));
+    }
 
 }

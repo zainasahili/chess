@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -20,7 +19,7 @@ public class ServerFacade {
     private final String url;
 
     public ServerFacade(String serverDomain) {
-       url = "https://" + serverDomain;
+       url = "http://" + serverDomain;
     }
 
     private Map request(String method, String endpoint, String body){
