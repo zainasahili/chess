@@ -9,6 +9,7 @@ public class Main {
         int port = server.run(0);
         ServerFacade facade = new ServerFacade("localhost:" + port);
 
+        System.out.println("Welcome to 240 chess. Type Help to get started.");
         PreLogin preLogin = new PreLogin(facade);
         preLogin.run();
 

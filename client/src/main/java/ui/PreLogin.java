@@ -17,7 +17,6 @@ public class PreLogin {
 
     public void run(){
         boolean loggedIn = false;
-        System.out.println("Welcome to 240 chess. Type Help to get started.");
 
         while (!loggedIn) {
             String[] input = getInput();

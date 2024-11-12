@@ -5,10 +5,10 @@ import java.util.Scanner;
 
 public class PostLogin {
 
-    ServerFacade server;
+    ServerFacade facade;
 
-    public PostLogin(ServerFacade server) {
-        this.server = server;
+    public PostLogin(ServerFacade facade) {
+        this.facade = facade;
     }
 
     public void run(){
@@ -22,26 +22,27 @@ public class PostLogin {
                     helpMenu();
                     break;
                 case "logout":
-                    if (server.logout()){
-                    loggedIn = false;}
+                    if (facade.logout()){
+                        loggedIn = false;
+                    }
                     break;
                 case "create":
                     if (input.length != 2){
                         System.out.println("Choose a name for the game");
                         System.out.println("create ‹NAME>");
-                    } else if (server.createGame(input[1])){
+                    } else if (facade.createGame(input[1])){
                         System.out.printf("%s game created\n", input[1]);
                     }
                     break;
                 case "list":
-                    System.out.printf("%s", server.listGame());
+                    System.out.printf("%s", facade.listGame());
                     break;
                 case "join":
                     if (input.length != 3){
                         System.out.println("Choose a game ID and player color");
                         System.out.println("join <ID> [WHITE|BLACK]");
                     } else {
-                        server.joinGame();
+                        facade.joinGame();
                     }
                     break;
                 case "observe":
@@ -49,7 +50,7 @@ public class PostLogin {
                         System.out.println("Choose a game ID");
                         System.out.println("observe ‹ID>");
                     } else{
-                        server.observeGame();
+                        facade.observeGame();
                     }
                     break;
                 default:
@@ -57,8 +58,12 @@ public class PostLogin {
                     helpMenu();
                     break;
             }
-
         }
+
+        PreLogin preLogin = new PreLogin(facade);
+        preLogin.run();
+
+
     }
 
     private String[] getInput() {
