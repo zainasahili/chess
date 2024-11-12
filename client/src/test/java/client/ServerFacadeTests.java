@@ -81,4 +81,18 @@ public class ServerFacadeTests {
         Assertions.assertFalse(facade.createGame("BYU"));
     }
 
+    @Test
+    public void validList(){
+        facade.register("username", "password", "email");
+        facade.login("username", "password");
+        facade.createGame("BYU");
+        facade.createGame("UVU");
+        Assertions.assertEquals(2, facade.listGames().size());
+    }
+
+    @Test
+    public void invalidList(){
+        Assertions.assertEquals(0,facade.listGames().size());
+    }
+
 }

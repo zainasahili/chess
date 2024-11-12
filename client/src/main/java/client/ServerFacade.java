@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import model.GameData;
 
 import java.io.IOException;
@@ -10,10 +11,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ServerFacade {
     private final String url;
@@ -101,12 +99,15 @@ public class ServerFacade {
         return !request("POST", "/game", jsonBody).containsKey("Error");
     }
 
-    public Collection<GameData> listGame(){
+    public Collection<GameData> listGames(){
         var resp = request("GET","/game", null);
-        if (!resp.containsKey("Error")){
-            return HashSet.newHashSet(16);
+        if (resp.containsKey("Error")){
+            return new HashSet<>();
         }
-        return new Gson().fromJson((Reader) resp, Collection.class);
+        Object gamesObj = resp.get("games");
+        String gamesJson = new Gson().toJson(gamesObj);
+
+        return new Gson().fromJson(gamesJson, new TypeToken<Collection<GameData>>(){}.getType());
     }
 
     public void joinGame(){

@@ -35,7 +35,7 @@ public class PostLogin {
                     }
                     break;
                 case "list":
-                    System.out.printf("%s", facade.listGame());
+                    System.out.printf("%s", facade.listGames());
                     break;
                 case "join":
                     if (input.length != 3){
