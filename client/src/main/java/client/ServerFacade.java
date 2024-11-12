@@ -20,7 +20,7 @@ public class ServerFacade {
     private final String url;
 
     public ServerFacade(String serverDomain) {
-       url = "https://" + serverDomain;
+       url = "http://" + serverDomain;
     }
 
     private Map request(String method, String endpoint, String body){
@@ -38,9 +38,10 @@ public class ServerFacade {
       return reqmap;
     }
     private HttpURLConnection connection(String method, String endpoint, String body ) throws IOException, URISyntaxException {
-        URI uri = new URI(url);
+        URI uri = new URI(url + endpoint);
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
         http.setRequestMethod(method);
+
 
         if (!Objects.equals(body, null)){
             http.setDoOutput(true);
@@ -55,27 +56,27 @@ public class ServerFacade {
     public boolean register(String username, String password, String email){
         var body = Map.of("username", username, "password", password, "email", email);
         var jsonBody = new Gson().toJson(body);
-        return !request("post", "/user", jsonBody).containsKey("Error");
+        return !request("POST", "/user", jsonBody).containsKey("Error");
     }
 
     public boolean login(String username, String password){
         var body = Map.of("username", username, "password", password);
         var jsonBody = new Gson().toJson(body);
-        return !request("post", "/session", jsonBody).containsKey("Error");
+        return !request("POST", "/session", jsonBody).containsKey("Error");
     }
 
     public void logout(){
-        request("delete", "/session", null);
+        request("DELETE", "/session", null);
     }
 
     public boolean createGame(String name){
         var body = Map.of("name", name);
         var jsonBody = new Gson().toJson(body);
-        return !request("post", "/game", jsonBody).containsKey("Error");
+        return !request("POST", "/game", jsonBody).containsKey("Error");
     }
 
     public Collection<GameData> listGame(){
-        var resp = request("get","/game", null);
+        var resp = request("GET","/game", null);
         if (!resp.containsKey("Error")){
             return HashSet.newHashSet(16);
         }
