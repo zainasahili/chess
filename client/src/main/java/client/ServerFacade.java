@@ -115,13 +115,17 @@ public class ServerFacade {
     }
 
     public boolean joinGame(ChessGame.TeamColor color, int gameID){
-        var body = Map.of("playerColor", color, "gameID", gameID);
+        Map body;
+        if (color != null) {
+            body = Map.of("playerColor", color, "gameID", gameID);
+        }else {
+            body = Map.of("gameID", gameID);
+        }
         var jsonBody = new Gson().toJson(body);
         var resp = request("PUT", "/game", jsonBody);
         return !resp.containsKey("Error");
 
     }
 
-    public void observeGame(){}
 
 }

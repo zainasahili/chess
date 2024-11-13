@@ -69,11 +69,15 @@ public class PostLogin {
                     }
                     break;
                 case "observe":
-                    if (input.length != 2){
+                    if (input.length != 2 || !input[1].matches("\\d")){
                         System.out.println("Choose a game ID");
                         System.out.println("observe ‹ID>");
                     } else{
-                        facade.observeGame();
+                        List<GameData> result = new ArrayList<>(games);
+                        GameData game = result.get(Integer.parseInt(input[1]));
+                        if (facade.joinGame(null, game.gameID())){
+                            System.out.printf("you have joined the %s game as an observer\n", game.gameName());
+                        }
                     }
                     break;
                 default:
