@@ -8,7 +8,6 @@ import model.GameData;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -94,10 +93,14 @@ public class ServerFacade {
         return true;
     }
 
-    public boolean createGame(String name){
+    public int createGame(String name){
         var body = Map.of("gameName", name);
         var jsonBody = new Gson().toJson(body);
-        return !request("POST", "/game", jsonBody).containsKey("Error");
+        Map resp = request("POST", "/game", jsonBody);
+        if (resp.containsKey("Error")){
+            return -1;
+        }
+        return (int) (double) resp.get("gameID");
     }
 
     public Collection<GameData> listGames(){
@@ -111,7 +114,7 @@ public class ServerFacade {
         return new Gson().fromJson(gamesJson, new TypeToken<Collection<GameData>>(){}.getType());
     }
 
-    public boolean joinGame(String color, int gameID){
+    public boolean joinGame(ChessGame.TeamColor color, int gameID){
         var body = Map.of("playerColor", color, "gameID", gameID);
         var jsonBody = new Gson().toJson(body);
         var resp = request("PUT", "/game", jsonBody);

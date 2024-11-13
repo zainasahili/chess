@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import server.Server;
 
@@ -73,13 +74,13 @@ public class ServerFacadeTests {
     public void validCreate(){
         facade.register("username", "password", "email");
         facade.login("username", "password");
-        boolean resp = facade.createGame("BYU");
-        Assertions.assertTrue(resp);
+        int resp = facade.createGame("BYU");
+        Assertions.assertTrue(resp >= 0);
     }
 
     @Test
     public void invalidCreate(){
-        Assertions.assertFalse(facade.createGame("BYU"));
+        Assertions.assertEquals(-1, facade.createGame("BYU"));
     }
 
     @Test
@@ -94,6 +95,19 @@ public class ServerFacadeTests {
     @Test
     public void invalidList(){
         Assertions.assertEquals(0,facade.listGames().size());
+    }
+
+    @Test
+    public void validJoin(){
+        facade.register("username", "password", "email");
+        facade.login("username", "password");
+        int gameID = facade.createGame("BYU");
+        Assertions.assertTrue(facade.joinGame(ChessGame.TeamColor.WHITE, gameID));
+    }
+
+    @Test
+    public void invalidJoin(){
+        Assertions.assertFalse(facade.joinGame(ChessGame.TeamColor.WHITE, 0));
     }
 
 }
