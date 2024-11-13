@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.GameData;
@@ -94,7 +95,7 @@ public class ServerFacade {
     }
 
     public boolean createGame(String name){
-        var body = Map.of("name", name);
+        var body = Map.of("gameName", name);
         var jsonBody = new Gson().toJson(body);
         return !request("POST", "/game", jsonBody).containsKey("Error");
     }
@@ -110,7 +111,11 @@ public class ServerFacade {
         return new Gson().fromJson(gamesJson, new TypeToken<Collection<GameData>>(){}.getType());
     }
 
-    public void joinGame(){
+    public boolean joinGame(String color, int gameID){
+        var body = Map.of("playerColor", color, "gameID", gameID);
+        var jsonBody = new Gson().toJson(body);
+        var resp = request("PUT", "/game", jsonBody);
+        return !resp.containsKey("Error");
 
     }
 

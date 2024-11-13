@@ -1,6 +1,9 @@
 package ui;
 
 import client.ServerFacade;
+import model.GameData;
+
+import java.util.Collection;
 import java.util.Scanner;
 
 public class PostLogin {
@@ -35,15 +38,22 @@ public class PostLogin {
                     }
                     break;
                 case "list":
-                    System.out.printf("%s", facade.listGames());
+                    Collection<GameData> games = facade.listGames();
+                    int i = 1;
+                    for (GameData game: games){
+                        System.out.printf("%d. Game: %s, WhitePlayer: %s, BlackPlayer: %s\n",
+                                i, game.gameName(), game.whiteUsername(), game.blackUsername());
+                        i++;
+                    }
                     break;
                 case "join":
                     if (input.length != 3){
                         System.out.println("Choose a game ID and player color");
                         System.out.println("join <ID> [WHITE|BLACK]");
-                    } else {
-                        facade.joinGame();
                     }
+//                    else {
+//                        facade.joinGame(input[2], int(input[1]));
+//                    }
                     break;
                 case "observe":
                     if (input.length != 2){

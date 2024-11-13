@@ -73,7 +73,8 @@ public class ServerFacadeTests {
     public void validCreate(){
         facade.register("username", "password", "email");
         facade.login("username", "password");
-        Assertions.assertTrue(facade.createGame("BYU"));
+        boolean resp = facade.createGame("BYU");
+        Assertions.assertTrue(resp);
     }
 
     @Test
