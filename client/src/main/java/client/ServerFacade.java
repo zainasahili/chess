@@ -17,8 +17,13 @@ public class ServerFacade {
     private final String url;
     String authToken;
 
-    public ServerFacade(String serverDomain) {
-       url = "http://" + serverDomain;
+
+    public ServerFacade() {
+       url = "http://localhost:8080";
+    }
+
+    public ServerFacade(String serverDomain){
+        url = "http://" + serverDomain;
     }
     private String getAuthToken(){
         return authToken;
