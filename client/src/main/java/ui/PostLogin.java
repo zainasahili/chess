@@ -57,11 +57,13 @@ public class PostLogin {
                         System.out.println("join <ID> [WHITE|BLACK]");
                     }
                     else {
+                        games = facade.listGames();
                         List<GameData> result = new ArrayList<>(games);
                         GameData game = result.get(Integer.parseInt(input[1]));
                         ChessGame.TeamColor color = input[2].equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                         if (facade.joinGame(color, game.gameID())){
                             System.out.println("You have joined the game");
+                            new BoardLayout(game.game().getBoard()).printBoard();
                         }
                         else{
                             System.out.println("Color taken or game doesn't exist");
@@ -72,12 +74,12 @@ public class PostLogin {
                     if (input.length != 2 || !input[1].matches("\\d")){
                         System.out.println("Choose a game ID");
                         System.out.println("observe ‹ID>");
-                    } else{
+                    }
+                    else {
+                        games = facade.listGames();
                         List<GameData> result = new ArrayList<>(games);
                         GameData game = result.get(Integer.parseInt(input[1]));
-                        if (facade.joinGame(null, game.gameID())){
-                            System.out.printf("you have joined the %s game as an observer\n", game.gameName());
-                        }
+                        new BoardLayout(game.game().getBoard()).printBoard();
                     }
                     break;
                 default:

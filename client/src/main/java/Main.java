@@ -1,6 +1,5 @@
 import client.ServerFacade;
 import ui.PreLogin;
-
 import server.Server;
 
 public class Main {
@@ -12,6 +11,5 @@ public class Main {
         System.out.println("Welcome to 240 chess. Type Help to get started.");
         PreLogin preLogin = new PreLogin(facade);
         preLogin.run();
-
     }
 }

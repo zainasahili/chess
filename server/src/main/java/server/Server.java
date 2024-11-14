@@ -1,17 +1,13 @@
 package server;
 
 import dataaccess.*;
-import model.AuthData;
 import service.GameService;
 import spark.*;
-import server.Handler;
 import service.UserService;
 
-import java.util.HashSet;
 
 public class Server {
 
-//    HashSet<AuthData> db = new HashSet<>();
 
     UserDAO userDAO = new SQLUser();
     GameDAO gameDAO = new SQLGame();
@@ -35,10 +31,6 @@ public class Server {
         Spark.post("/game", handler::createGame);
         Spark.put("/game", handler::joinGame);
         Spark.delete("/db", handler::clear);
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-//        Spark.init();
-
-
 
         Spark.awaitInitialization();
         return Spark.port();
