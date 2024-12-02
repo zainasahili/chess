@@ -26,7 +26,7 @@ public class PreLogin {
                     helpMenu();
                     break;
                 case "quit":
-                    return;
+                    System.exit(0);
                 case "login":
                     if (input.length != 3) {
                         System.out.println("please provide a username and password");
