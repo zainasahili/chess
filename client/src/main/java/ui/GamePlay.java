@@ -80,6 +80,10 @@ public class GamePlay {
                     System.out.println("move <from> <to> <promotion piece> - make a move (promotion piece should only be used if a move will promote a pawn)");
                 }
             }
+            facade.makeMove();
+        } else{
+            System.out.println("please provide from and to coordinates. ex: 4a 5c");
+            System.out.println("move <from> <to> <promotion piece> - make a move (promotion piece should only be used if a move will promote a pawn)");
         }
     }
     private ChessPiece.PieceType getPieceType(String piece){

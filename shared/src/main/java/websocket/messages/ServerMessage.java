@@ -10,6 +10,9 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    private String errorMessage;
+    private int game;
+    private String message;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -25,15 +28,26 @@ public class ServerMessage {
         return this.serverMessageType;
     }
 
+    public String getMessageError(){
+        return errorMessage;
+    }
+
+    public int getGame(){
+        return game;
+    }
+
+    public String getMessage(){
+        return message;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ServerMessage)) {
+        if (!(o instanceof ServerMessage that)) {
             return false;
         }
-        ServerMessage that = (ServerMessage) o;
         return getServerMessageType() == that.getServerMessageType();
     }
 

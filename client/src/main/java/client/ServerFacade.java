@@ -131,6 +131,12 @@ public class ServerFacade {
         return !resp.containsKey("Error");
 
     }
+    public void leaveGame(){
+
+    }
+    public void resign(){}
+
+    public void makeMove(){}
 
 
 }
