@@ -4,6 +4,7 @@ import dataaccess.*;
 import service.GameService;
 import spark.*;
 import service.UserService;
+import org.eclipse.jetty.websocket.api.Session;
 
 import java.util.concurrent.ConcurrentHashMap;
 

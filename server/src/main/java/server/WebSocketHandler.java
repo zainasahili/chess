@@ -24,7 +24,7 @@ public class WebSocketHandler {
 
     @OnWebSocketConnect
     public void onConnect(Session session){
-        Server.sessions.put((spark.Session) session, 0);
+        Server.sessions.put(session, 0);
     }
 
     @OnWebSocketClose
@@ -71,13 +71,26 @@ public class WebSocketHandler {
             }
             announceNotification(session, notification);
             Server.gameDAO.updateGame(gameData);
-
+        } else{
+            Error error = new Error("It's not your turn");
+            System.out.printf("Error: %s", new Gson().toJson(error));
+            session.getRemote().sendString(new Gson().toJson(error));
         }
-    }
-    private void announceNotification(Session session, ServerMessage notification){
-
     }
     private void leave(Session session, UserGameCommand msg){}
 
     private void resign(Session session, UserGameCommand msg){}
+
+    private void announceNotification(Session currSession, ServerMessage notification) throws IOException {
+        System.out.printf("Announcing: %s", new Gson().toJson(notification));
+        for (var session: Server.sessions.keySet()){
+            boolean in = Server.sessions.get(session) != 0;
+            boolean same = Server.sessions.get(session).equals(Server.sessions.get(currSession));
+            boolean self = session == currSession;
+            if (self && in && same){
+                session.getRemote().sendString(new Gson().toJson(notification));
+            }
+        }
+    }
+
 }
