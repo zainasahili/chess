@@ -16,7 +16,8 @@ import java.util.*;
 public class ServerFacade {
     private final String url;
     String authToken;
-
+    WebSocket ws;
+    String serverDomain;
 
     public ServerFacade() {
        url = "http://localhost:8080";
@@ -130,6 +131,14 @@ public class ServerFacade {
         var resp = request("PUT", "/game", jsonBody);
         return !resp.containsKey("Error");
 
+    }
+
+    public void connectToWs(){
+        try{
+            ws = new WebSocket(serverDomain);
+        } catch (Exception e) {
+            System.out.println("Failed to connect to WebSocket");
+        }
     }
     public void leaveGame(){
 

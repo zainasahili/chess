@@ -5,18 +5,21 @@ import service.GameService;
 import spark.*;
 import service.UserService;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class Server {
 
 
     UserDAO userDAO = new SQLUser();
-    GameDAO gameDAO = new SQLGame();
-    AuthDAO authDAO = new SQLAuth();
+    static GameDAO gameDAO = new SQLGame();
+    static AuthDAO authDAO = new SQLAuth();
 
     UserService userService = new UserService(userDAO, authDAO);
     GameService gameService = new GameService(gameDAO, authDAO);
     Handler handler = new Handler(userService, gameService);
 
+    static ConcurrentHashMap<Session, Integer> sessions = new ConcurrentHashMap<>();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -24,6 +27,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
+        Spark.webSocket("/connect", WebSocketHandler.class);
         Spark.post("/user", handler::register);
         Spark.post("/session", handler::login);
         Spark.delete("/session", handler::logout);
