@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -14,10 +15,17 @@ public class GamePlay {
     ServerFacade facade;
     BoardLayout boardLayout;
     int gameID;
+    ChessGame.TeamColor color;
 
     public GamePlay(ServerFacade facade, GameData gameData) {
         this.facade = facade;
         this.gameID = gameData.gameID();
+    }
+
+    public GamePlay(ServerFacade facade, GameData gameData, ChessGame.TeamColor color) {
+        this.facade = facade;
+        this.gameID = gameData.gameID();
+        this.color = color;
     }
 
 
@@ -35,7 +43,7 @@ public class GamePlay {
                     break;
                 case "leave":
                     in = false;
-                    facade.leaveGame();
+                    facade.leaveGame(gameID);
                     break ;
                 case "make move":
                     makeMove(input);
@@ -44,7 +52,7 @@ public class GamePlay {
                     System.out.println("Are you sure you want to resign? (yes/no)");
                     String[] answer = getInput();
                     if (answer.length == 1 && Objects.equals(answer[0], "yes")) {
-                        facade.resign();
+                        facade.resign(gameID);
                     } else {
                         System.out.println("Resignation cancelled");
                     }

@@ -63,7 +63,8 @@ public class PostLogin {
                         ChessGame.TeamColor color = input[2].equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                         if (facade.joinGame(color, game.gameID())){
                             System.out.println("You have joined the game");
-                            GamePlay gamePlay = new GamePlay(facade, game);
+                            facade.connectToWs();
+                            GamePlay gamePlay = new GamePlay(facade, game, color);
                             gamePlay.run();
                             new BoardLayout(game.game().getBoard()).printBoard();
                         }
@@ -81,6 +82,9 @@ public class PostLogin {
                         games = facade.listGames();
                         List<GameData> result = new ArrayList<>(games);
                         GameData game = result.get(Integer.parseInt(input[1]));
+                        facade.connectToWs();
+                        GamePlay gamePlay = new GamePlay(facade, game);
+                        gamePlay.run();
                         new BoardLayout(game.game().getBoard()).printBoard();
                     }
                     break;

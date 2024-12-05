@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.GameData;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -143,13 +142,21 @@ public class ServerFacade {
             System.out.println("Failed to connect to WebSocket");
         }
     }
-    public void leaveGame(){
-
+    public void leaveGame(int gameID){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        String command = new Gson().toJson(msg);
+        ws.sendMessage(command);
     }
-    public void resign(){}
+    public void resign(int gameID){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        String command = new Gson().toJson(msg);
+        ws.sendMessage(command);
+    }
 
     public void makeMove(int gameID, ChessMove move){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE,gameID);
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+        String command = new Gson().toJson(msg);
+        ws.sendMessage(command);
     }
 
 
