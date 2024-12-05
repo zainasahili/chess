@@ -8,6 +8,7 @@ import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
+import org.eclipse.jetty.util.Scanner;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.Session;
@@ -91,7 +92,28 @@ public class WebSocketHandler {
         }
     }
 
-    private void resign(Session session, UserGameCommand msg){}
+    private void resign(Session session, UserGameCommand msg){
+        try{
+            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
+            GameData gameData = Server.gameDAO.getGame(msg.getGameID());
+            ChessGame.TeamColor color = auth.username().equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+
+            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.whiteUsername() : gameData.blackUsername();
+
+            if (gameData.game().isGameOver()){
+                Error error = new Error("Game is already over");
+                System.out.printf("Error: %s", new Gson().toJson(error));
+                session.getRemote().sendString(new Gson().toJson(error));
+            }
+
+            gameData.game().setGameOver(true);
+            Server.gameDAO.updateGame(gameData);
+            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername));
+            announceNotification(session, notify);
+        } catch (DataAccessException | BadRequestException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private void announceNotification(Session currSession, ServerMessage notification) throws IOException {
         System.out.printf("Announcing: %s", new Gson().toJson(notification));
