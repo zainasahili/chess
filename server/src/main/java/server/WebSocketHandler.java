@@ -17,6 +17,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 
+import javax.management.Notification;
 import java.awt.*;
 import java.io.IOException;
 
@@ -77,7 +78,18 @@ public class WebSocketHandler {
             session.getRemote().sendString(new Gson().toJson(error));
         }
     }
-    private void leave(Session session, UserGameCommand msg){}
+    private void leave(Session session, UserGameCommand msg) throws IOException {
+        try{
+            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
+
+            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()));
+            announceNotification(session, notify);
+        } catch (DataAccessException | IOException e) {
+            Error error = new Error("Not authorizes");
+            System.out.printf("Error: %s", new Gson().toJson(error));
+            session.getRemote().sendString(new Gson().toJson(error));
+        }
+    }
 
     private void resign(Session session, UserGameCommand msg){}
 

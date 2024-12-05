@@ -12,6 +12,11 @@ public class GamePlay {
     ServerFacade facade;
     BoardLayout boardLayout;
 
+    public GamePlay(ServerFacade facade) {
+        this.facade = facade;
+    }
+
+
     public void run(){
         boolean in = true;
         while (in){
@@ -57,7 +62,7 @@ public class GamePlay {
     }
 
     private String[] getInput() {
-        System.out.print("\n[LOGGED_IN] >>> ");
+        System.out.print("\n[IN_GAME] >>> ");
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine().split(" ");
     }

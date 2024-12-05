@@ -63,6 +63,8 @@ public class PostLogin {
                         ChessGame.TeamColor color = input[2].equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                         if (facade.joinGame(color, game.gameID())){
                             System.out.println("You have joined the game");
+                            GamePlay gamePlay = new GamePlay(facade);
+                            gamePlay.run();
                             new BoardLayout(game.game().getBoard()).printBoard();
                         }
                         else{
