@@ -1,9 +1,12 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.GameData;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,7 +148,9 @@ public class ServerFacade {
     }
     public void resign(){}
 
-    public void makeMove(){}
+    public void makeMove(int gameID, ChessMove move){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE,gameID);
+    }
 
 
 }

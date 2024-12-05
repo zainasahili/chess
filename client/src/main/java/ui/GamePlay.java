@@ -1,8 +1,10 @@
 package ui;
 
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import client.ServerFacade;
+import model.GameData;
 
 import java.util.Objects;
 import java.util.Scanner;
@@ -11,9 +13,11 @@ public class GamePlay {
 
     ServerFacade facade;
     BoardLayout boardLayout;
+    int gameID;
 
-    public GamePlay(ServerFacade facade) {
+    public GamePlay(ServerFacade facade, GameData gameData) {
         this.facade = facade;
+        this.gameID = gameData.gameID();
     }
 
 
@@ -59,6 +63,8 @@ public class GamePlay {
                     break;
             }
         }
+        PostLogin postLogin = new PostLogin(facade);
+        postLogin.run();
     }
 
     private String[] getInput() {
@@ -85,7 +91,7 @@ public class GamePlay {
                     System.out.println("move <from> <to> <promotion piece> - make a move (promotion piece should only be used if a move will promote a pawn)");
                 }
             }
-            facade.makeMove();
+            facade.makeMove(gameID, new ChessMove(from, to, promotion));
         } else{
             System.out.println("please provide from and to coordinates. ex: 4a 5c");
             System.out.println("move <from> <to> <promotion piece> - make a move (promotion piece should only be used if a move will promote a pawn)");
