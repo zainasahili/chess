@@ -3,8 +3,7 @@ package server;
 import chess.ChessGame;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -38,7 +37,14 @@ public class WebSocketHandler {
             leave(session, msg);
         } else if (msg.getCommandType().equals(UserGameCommand.CommandType.RESIGN)){
             resign(session, msg);
+        } else if (msg.getCommandType().equals(UserGameCommand.CommandType.CONNECT)){
+            connect(session, msg);
         }
+    }
+
+    private void connect(Session session, UserGameCommand msg) throws BadRequestException, DataAccessException {
+
+
     }
     private void makeMove(Session session, UserGameCommand msg) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
         AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
