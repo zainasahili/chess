@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
 import websocket.messages.ServerMessage;
-import websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class WebSocket extends Endpoint {
 

@@ -1,14 +1,12 @@
 package server;
 
 import chess.ChessGame;
-import chess.ChessPiece;
 import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.util.Scanner;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.Session;
@@ -16,12 +14,9 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
-
-
-import javax.management.Notification;
-import java.awt.*;
 import java.io.IOException;
 
+@WebSocket
 public class WebSocketHandler {
 
     @OnWebSocketConnect
