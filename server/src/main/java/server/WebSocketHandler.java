@@ -93,9 +93,7 @@ public class WebSocketHandler {
         if (gameData.game().getTeamTurn() != color){
             ServerMessage errorMessage = new ServerMessage("It's not your turn", null);
             session.getRemote().sendString(new Gson().toJson(errorMessage));
-            return;
-        }
-        if (color == null){
+        } else if (color == null){
             ServerMessage error = new ServerMessage("You are an observer. you can't make a move", null);
             session.getRemote().sendString(new Gson().toJson(error));
         } else if (gameData.game().isGameOver()){
@@ -111,13 +109,13 @@ public class WebSocketHandler {
             }
             Server.gameDAO.updateGame(gameData);
 
-            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
-            session.getRemote().sendString(new Gson().toJson(command));
-
             ServerMessage notification;
             ChessGame.TeamColor oppColor = color == ChessGame.TeamColor.WHITE? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
-            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()), gameData.gameID());
+            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
+            announceNotification(session,command, authData.authToken(), "notUser");
+
+            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()), null);
             announceNotification(session, notification, msg.getAuthToken(), "notUser");
 
 
@@ -134,9 +132,10 @@ public class WebSocketHandler {
                 announceNotification(session, notification, msg.getAuthToken(), "everyone");
             }
 
-        } else{
-            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "It's not your turn", gameData.gameID());
-            session.getRemote().sendString(new Gson().toJson(error));
+//            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
+            session.getRemote().sendString(new Gson().toJson(command));
+//            announceNotification(session,command, authData.authToken(), "everyone");
+
         }
     }
 //    private void leave(Session session, UserGameCommand msg) throws IOException {
@@ -182,7 +181,7 @@ public class WebSocketHandler {
             switch (audience) {
                 case ("everyone"):
                     if (in) {
-                        session.getRemote().sendString(new Gson().toJson(notification.getServerMessageType()));
+                        session.getRemote().sendString(new Gson().toJson(notification));
                     }
                     break;
                 case ("notUser"):
