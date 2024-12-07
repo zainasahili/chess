@@ -11,7 +11,7 @@ import java.util.Objects;
 public class ServerMessage {
     ServerMessageType serverMessageType;
     private String errorMessage;
-    private int game;
+    private Integer game;
     private String message;
 
     public enum ServerMessageType {
@@ -20,17 +20,25 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type) {
+    public ServerMessage(ServerMessageType type, Integer game) {
         this.serverMessageType = type;
+        this.game = game;
     }
 
-    public ServerMessage(ServerMessageType type, String message){
+    public ServerMessage(String errorMessage, Integer game){
+        this.serverMessageType = ServerMessageType.ERROR;
+        this.errorMessage = errorMessage;
+        this.game = game;
+    }
+
+    public ServerMessage(ServerMessageType type, String message, Integer game){
         this.serverMessageType = type;
         this.message = message;
+        this.game = game;
     }
 
     public ServerMessageType getServerMessageType() {
-        return this.serverMessageType;
+        return serverMessageType;
     }
 
     public String getMessageError(){
