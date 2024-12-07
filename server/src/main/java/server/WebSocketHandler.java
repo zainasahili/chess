@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -23,6 +24,10 @@ public class WebSocketHandler {
         Server.sessions.put(session, 0);
     }
 
+    @OnWebSocketClose
+    public void onClose(Session session, int statusCode, String reason) {
+        Server.sessions.remove(session);
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
