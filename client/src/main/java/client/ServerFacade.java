@@ -21,12 +21,10 @@ public class ServerFacade {
     WebSocket ws;
     String serverDomain;
 
-    public ServerFacade() {
-       url = "http://localhost:8080";
-    }
-
     public ServerFacade(String serverDomain){
+        this.serverDomain = serverDomain;
         url = "http://" + serverDomain;
+
     }
     private String getAuthToken(){
         return authToken;
@@ -142,19 +140,29 @@ public class ServerFacade {
             System.out.println("Failed to connect to WebSocket");
         }
     }
+    public void joinPlayer(int gameID, ChessGame.TeamColor color){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, color);
+        String command = new Gson().toJson(msg);
+        ws.sendMessage(command);
+    }
+    public void observe(int gameID){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, null);
+        String command = new Gson().toJson(msg);
+        ws.sendMessage(command);
+    }
     public void leaveGame(int gameID){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, null);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
     public void resign(int gameID){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, null);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
 
     public void makeMove(int gameID, ChessMove move){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, null);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }

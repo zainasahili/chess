@@ -14,7 +14,7 @@ public class WebSocket extends Endpoint {
 
     public WebSocket(String ServerDomain) throws Exception {
         try {
-            URI uri = new URI("ws://" + ServerDomain + "/connect");
+            URI uri = new URI("ws://" + ServerDomain + "/ws");
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, uri);
 

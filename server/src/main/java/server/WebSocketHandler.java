@@ -6,7 +6,6 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -14,6 +13,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -23,14 +23,11 @@ public class WebSocketHandler {
         Server.sessions.put(session, 0);
     }
 
-    @OnWebSocketClose
-    public void onClose(Session session){
-        Server.sessions.remove(session);
-    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
         UserGameCommand msg = new Gson().fromJson(message, UserGameCommand.class);
+
         if (msg.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)){
             makeMove(session, msg);
         } else if (msg.getCommandType().equals(UserGameCommand.CommandType.LEAVE)){
@@ -42,16 +39,61 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(Session session, UserGameCommand msg) throws BadRequestException, DataAccessException {
+    private void connect(Session session, UserGameCommand msg){
+            try{
+                AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
+                if (Server.gameDAO.getGame(msg.getGameID()) == null){
+                    Error error = new Error("You are joining with the wrong color");
+//                    System.out.printf("Error: %s", new Gson().toJson(error));
+                    session.getRemote().sendString(new Gson().toJson(error));
+                }
+                GameData gameData = Server.gameDAO.getGame(msg.getGameID());
+                ChessGame.TeamColor color = null;
+                if (Objects.equals(authData.username(), gameData.whiteUsername())){
+                    color = ChessGame.TeamColor.WHITE;
+                } else if (Objects.equals(authData.username(), gameData.blackUsername())) {
+                    color = ChessGame.TeamColor.BLACK;
+                }
+                if (color != null) {
+                    boolean player;
+                    if (color == ChessGame.TeamColor.WHITE) {
+                        player = Objects.equals(authData.username(), gameData.whiteUsername());
+                    } else {
+                        player = Objects.equals(authData.username(), gameData.blackUsername());
+                    }
+                    if (!player){
+                        Error error = new Error("You are joining with the wrong color");
+                        System.out.printf("Error: %s", new Gson().toJson(error));
+                        session.getRemote().sendString(new Gson().toJson(error));
+                    }
+                    ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has joined the game as %s".formatted(authData.username(), color));
+                    announceNotification(session, notify, msg.getAuthToken(), "notUser");
+
+                } else{
+                    ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has joined the game as an observer".formatted(authData.username()));
+                    announceNotification(session, notify, msg.getAuthToken(), "notUser");
+                }
+
+                ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+                session.getRemote().sendString(new Gson().toJson(command));
+
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
 
     }
     private void makeMove(Session session, UserGameCommand msg) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
         AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
         GameData gameData = Server.gameDAO.getGame(msg.getGameID());
-        ChessGame.TeamColor color =  authData.username().equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
+        ChessGame.TeamColor color =  getColor(gameData, authData.username());
 
-        if (gameData.game().isGameOver()){
+        if (color == null){
+            Error error = new Error("You are an observer. you can't make a move");
+            System.out.printf("Error: %s", new Gson().toJson(error));
+            session.getRemote().sendString(new Gson().toJson(error));
+        } else if (gameData.game().isGameOver()){
             Error error = new Error("Game is over");
             System.out.printf("Error: %s", new Gson().toJson(error));
             session.getRemote().sendString(new Gson().toJson(error));
@@ -72,8 +114,11 @@ public class WebSocketHandler {
             } else{
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()));
             }
-            announceNotification(session, notification);
+            announceNotification(session, notification, msg.getAuthToken(), "everyone");
             Server.gameDAO.updateGame(gameData);
+
+            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, new Gson().toJson(notification));
+            session.getRemote().sendString(new Gson().toJson(command));
         } else{
             Error error = new Error("It's not your turn");
             System.out.printf("Error: %s", new Gson().toJson(error));
@@ -85,7 +130,7 @@ public class WebSocketHandler {
             AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
 
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()));
-            announceNotification(session, notify);
+            announceNotification(session, notify, msg.getAuthToken(), "notUser");
         } catch (DataAccessException | IOException e) {
             Error error = new Error("Not authorizes");
             System.out.printf("Error: %s", new Gson().toJson(error));
@@ -110,21 +155,48 @@ public class WebSocketHandler {
             gameData.game().setGameOver(true);
             Server.gameDAO.updateGame(gameData);
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername));
-            announceNotification(session, notify);
+            announceNotification(session, notify, msg.getAuthToken(), "everyone");
         } catch (DataAccessException | BadRequestException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void announceNotification(Session currSession, ServerMessage notification) throws IOException {
-        System.out.printf("Announcing: %s", new Gson().toJson(notification));
+    private void announceNotification(Session currSession, ServerMessage notification, String authToken, String audience) throws IOException {
+        // to everyone, user, notUser
+        System.out.printf(new Gson().toJson(notification));
         for (var session: Server.sessions.keySet()){
+//            System.out.println(session);
+//            System.out.println(currSession);
+//            System.out.println();
             boolean in = Server.sessions.get(session) != 0;
             boolean same = Server.sessions.get(session).equals(Server.sessions.get(currSession));
-            boolean self = session == currSession;
-            if (self && in && same){
-                session.getRemote().sendString(new Gson().toJson(notification));
+            boolean toSelf = session == currSession;
+            switch (audience) {
+                case ("everyone"):
+                    if (in) {
+                        session.getRemote().sendString(new Gson().toJson(notification));
+                    }
+                case ("notUser"):
+                    if (!toSelf) {
+                        session.getRemote().sendString(new Gson().toJson(notification));
+                    }
+                    break;
+                case ("user"):
+                    if ((toSelf || same) && in) {
+                        session.getRemote().sendString(new Gson().toJson(notification));
+                    }
+                    break;
             }
+
+        }
+    }
+    private ChessGame.TeamColor getColor(GameData gameData, String username){
+        if (username.equals(gameData.whiteUsername())){
+            return ChessGame.TeamColor.WHITE;
+        } else if (username.equals(gameData.blackUsername())){
+            return ChessGame.TeamColor.BLACK;
+        } else{
+            return null;
         }
     }
 

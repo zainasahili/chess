@@ -8,11 +8,9 @@ import java.util.Scanner;
 public class PreLogin {
 
     ServerFacade facade;
-    PostLogin postLogin;
 
     public PreLogin(ServerFacade facade) {
         this.facade = facade;
-        postLogin = new PostLogin(facade);
     }
 
     public void run(){
@@ -58,6 +56,7 @@ public class PreLogin {
             }
 
         }
+        PostLogin postLogin = new PostLogin(facade);
         postLogin.run();
 
     }

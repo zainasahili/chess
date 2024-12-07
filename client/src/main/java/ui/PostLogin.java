@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import client.ServerFacade;
+import client.WebSocket;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public class PostLogin {
                         if (facade.joinGame(color, game.gameID())){
                             System.out.println("You have joined the game");
                             facade.connectToWs();
+                            facade.joinPlayer(game.gameID(), color);
                             GamePlay gamePlay = new GamePlay(facade, game, color);
                             gamePlay.run();
                             new BoardLayout(game.game().getBoard()).printBoard();
@@ -83,6 +85,7 @@ public class PostLogin {
                         List<GameData> result = new ArrayList<>(games);
                         GameData game = result.get(Integer.parseInt(input[1]));
                         facade.connectToWs();
+                        facade.observe(game.gameID());
                         GamePlay gamePlay = new GamePlay(facade, game);
                         gamePlay.run();
                         new BoardLayout(game.game().getBoard()).printBoard();
