@@ -86,34 +86,37 @@ public class WebSocketHandler {
         ChessGame.TeamColor color =  getColor(gameData, authData.username());
 
         if (color == null){
-            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "You are an observer. you can't make a move", gameData.gameID());
-
+            ServerMessage error = new ServerMessage("You are an observer. you can't make a move", gameData.gameID());
             session.getRemote().sendString(new Gson().toJson(error));
         } else if (gameData.game().isGameOver()){
-            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game is over", gameData.gameID());
+            ServerMessage error = new ServerMessage("Game is already over", gameData.gameID());
             session.getRemote().sendString(new Gson().toJson(error));
         } else if (gameData.game().getTeamTurn().equals(color)){
             gameData.game().makeMove(msg.getMove());
+            Server.gameDAO.updateGame(gameData);
+
+            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
+            session.getRemote().sendString(new Gson().toJson(command));
 
             ServerMessage notification;
             ChessGame.TeamColor oppColor = color == ChessGame.TeamColor.WHITE? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
+            notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()), gameData.gameID());
+            announceNotification(session, notification, msg.getAuthToken(), "notUser");
+
             if (gameData.game().isInCheckmate(oppColor)){
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate! %s wins".formatted(authData.username()), gameData.gameID());
                 gameData.game().setGameOver(true);
+                announceNotification(session, notification, msg.getAuthToken(), "everyone");
             } else if (gameData.game().isInCheck(oppColor)){
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Because of the last move, %s is now in check".formatted(oppColor.toString()), gameData.gameID());
+                announceNotification(session, notification, msg.getAuthToken(), "everyone");
             } else if (gameData.game().isInStalemate(oppColor)){
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "The game is in Stalemate. It's a tie!", gameData.gameID());
                 gameData.game().setGameOver(true);
-            } else{
-                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()), gameData.gameID());
+                announceNotification(session, notification, msg.getAuthToken(), "everyone");
             }
-            announceNotification(session, notification, msg.getAuthToken(), "everyone");
-            Server.gameDAO.updateGame(gameData);
 
-            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, new Gson().toJson(notification), gameData.gameID());
-            session.getRemote().sendString(new Gson().toJson(command));
         } else{
             ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "It's not your turn", gameData.gameID());
             session.getRemote().sendString(new Gson().toJson(error));
