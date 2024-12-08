@@ -36,11 +36,12 @@ public class WebSocketHandler {
         if (msg.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)){
             makeMove(session, msg);
         }
-//        else if (msg.getCommandType().equals(UserGameCommand.CommandType.LEAVE)){
-//            leave(session, msg);
-//        } else if (msg.getCommandType().equals(UserGameCommand.CommandType.RESIGN)){
-//            resign(session, msg);
-//    }
+        else if (msg.getCommandType().equals(UserGameCommand.CommandType.LEAVE)){
+            leave(session, msg);
+        }
+        else if (msg.getCommandType().equals(UserGameCommand.CommandType.RESIGN)){
+            resign(session, msg);
+    }
          else if (msg.getCommandType().equals(UserGameCommand.CommandType.CONNECT)){
             connect(session, msg);
         }
@@ -102,7 +103,7 @@ public class WebSocketHandler {
             ServerMessage error = new ServerMessage("You are an observer. you can't make a move", null);
             session.getRemote().sendString(new Gson().toJson(error));
         } else if (gameData.game().isGameOver()){
-            ServerMessage error = new ServerMessage("Game is already over", gameData.gameID());
+            ServerMessage error = new ServerMessage("Game is already over", null);
             session.getRemote().sendString(new Gson().toJson(error));
         } else if (gameData.game().getTeamTurn().equals(color)){
             try{
@@ -137,45 +138,62 @@ public class WebSocketHandler {
                 announceNotification(session, notification, msg.getAuthToken(), "everyone");
             }
 
-//            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
             session.getRemote().sendString(new Gson().toJson(command));
-//            announceNotification(session,command, authData.authToken(), "everyone");
 
         }
     }
-//    private void leave(Session session, UserGameCommand msg) throws IOException {
-//        try{
-//            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
-//
-//            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()));
-//            announceNotification(session, notify, msg.getAuthToken(), "notUser");
-//        } catch (DataAccessException | IOException e) {
-//            ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Not authorized");
-//            session.getRemote().sendString(new Gson().toJson(error));
-//        }
-//    }
-//
-//    private void resign(Session session, UserGameCommand msg){
-//        try{
-//            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
-//            GameData gameData = Server.gameDAO.getGame(msg.getGameID());
-//            ChessGame.TeamColor color = auth.username().equals(gameData.whiteUsername()) ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
-//
-//            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.whiteUsername() : gameData.blackUsername();
-//
-//            if (gameData.game().isGameOver()){
-//                ServerMessage error = new ServerMessage(ServerMessage.ServerMessageType.ERROR, "Game is already over");
-//                session.getRemote().sendString(new Gson().toJson(error));
-//            }
-//
-//            gameData.game().setGameOver(true);
-//            Server.gameDAO.updateGame(gameData);
-//            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername));
-//            announceNotification(session, notify, msg.getAuthToken(), "everyone");
-//        } catch (DataAccessException | BadRequestException | IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    private void leave(Session session, UserGameCommand msg) throws IOException {
+        try{
+            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
+
+            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()), null);
+            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+            Server.sessions.remove(session);
+            GameData gameData = Server.gameDAO.getGame(msg.getGameID());
+
+            if (auth.username().equals(gameData.whiteUsername())){
+                gameData = new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game());
+            } else if (auth.username().equals(gameData.blackUsername())){
+                gameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game());
+            }
+
+            Server.gameDAO.updateGame(gameData);
+            session.close();
+
+        } catch (DataAccessException | IOException e) {
+            ServerMessage error = new ServerMessage("Not authorized", null);
+            session.getRemote().sendString(new Gson().toJson(error));
+        } catch (BadRequestException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void resign(Session session, UserGameCommand msg){
+        try{
+            AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
+            GameData gameData = Server.gameDAO.getGame(msg.getGameID());
+            ChessGame.TeamColor color = getColor(gameData, auth.username());
+            if (color == null){
+                ServerMessage error = new ServerMessage("You are an observer. you can't resign", null);
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.whiteUsername() : gameData.blackUsername();
+
+            if (gameData.game().isGameOver()){
+                ServerMessage error = new ServerMessage("Game is already over", null);
+                session.getRemote().sendString(new Gson().toJson(error));
+                return;
+            }
+            gameData.game().setGameOver(true);
+            Server.gameDAO.updateGame(gameData);
+            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername), null);
+            session.getRemote().sendString(new Gson().toJson(notify));
+            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+        } catch (DataAccessException | BadRequestException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private void announceNotification(Session currSession, ServerMessage notification, String authToken, String audience) throws IOException {
         // to everyone, user, notUser
