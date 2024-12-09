@@ -21,6 +21,10 @@ public class ServerFacade {
     WebSocket ws;
     String serverDomain;
 
+    public ServerFacade(){
+        this("localhost:8080");
+    }
+
     public ServerFacade(String serverDomain){
         this.serverDomain = serverDomain;
         url = "http://" + serverDomain;
