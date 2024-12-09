@@ -205,6 +205,8 @@ public class WebSocketHandler {
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername), null);
             session.getRemote().sendString(new Gson().toJson(notify));
             announceNotification(session, notify, "notUser", gameData.gameID());
+            Server.sessions.remove(session);
+            session.close();
         } catch (DataAccessException | BadRequestException | IOException e) {
             throw new RuntimeException(e);
         }

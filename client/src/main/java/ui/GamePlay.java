@@ -44,21 +44,23 @@ public class GamePlay {
                     in = false;
                     facade.leaveGame(gameID, color);
                     break ;
-                case "make move":
+                case "move":
                     makeMove(input);
+                    boardLayout.printBoard(color, null);
                     break;
                 case "resign":
                     System.out.println("Are you sure you want to resign? (yes/no)");
                     String[] answer = getInput();
                     if (answer.length == 1 && Objects.equals(answer[0], "yes")) {
                         facade.resign(gameID, color);
+                        in = false;
                     } else {
                         System.out.println("Resignation cancelled");
                     }
                     break;
                 case "highlight":
                     if (input.length == 2 && input[1].matches("[a-h][1-8]")) {
-                        boardLayout.printBoard(color, new ChessPosition(1,1));
+                        boardLayout.printBoard(color, new ChessPosition(input[1].charAt(1) - '0', input[1].charAt(0) - ('a'-1)));
                     } else {
                         System.out.println("Please provide coordinates");
                         System.out.println("Highlight <coordinates> (ex: b3) - highlight all legal moves for the piece");
@@ -89,7 +91,9 @@ public class GamePlay {
     private void makeMove(String[] input){
         if (input.length >= 3 && input[1].matches("[a-h][1-8]") && input[2].matches("[a-h][1-8]")){
             ChessPosition from = new ChessPosition(input[1].charAt(1), input[1].charAt(0) - ('a'-1));
+            System.out.println(from);
             ChessPosition to = new ChessPosition(input[2].charAt(1), input[2].charAt(0) - ('a'-1));
+            System.out.println(to);
             ChessPiece.PieceType promotion = null;
             if (input.length == 4){
                 promotion = getPieceType(input[3]);

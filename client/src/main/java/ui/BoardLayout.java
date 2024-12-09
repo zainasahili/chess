@@ -19,7 +19,7 @@ public class BoardLayout {
     public void printBoard(ChessGame.TeamColor color, ChessPosition position){
         StringBuilder out = new StringBuilder();
 
-        boolean reversed = color == ChessGame.TeamColor.BLACK;
+        boolean reversed = color != ChessGame.TeamColor.BLACK;
         Collection<ChessMove> possibles = position != null? game.validMoves(position): null;
         HashSet<ChessPosition> squares = HashSet.newHashSet(possibles != null ? possibles.size() : 0);
         if (possibles != null){
