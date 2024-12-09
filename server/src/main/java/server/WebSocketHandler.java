@@ -47,15 +47,25 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(Session session, UserGameCommand msg) throws IOException, DataAccessException, BadRequestException {
-        AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
-        GameData gameData = Server.gameDAO.getGame(msg.getGameID());
-        if (gameData == null){
-            ServerMessage errorMessage = new ServerMessage("invalid game ID", null);
-            session.getRemote().sendString(new Gson().toJson(errorMessage));
-            return;
-        } else if (authData == null){
-            ServerMessage errorMessage = new ServerMessage("invalid AuthToken", null);
+    private void connect(Session session, UserGameCommand msg) throws IOException{
+        AuthData authData;
+        GameData gameData;
+
+        try {
+            // Attempt to get auth data
+            authData = Server.authDAO.getAuth(msg.getAuthToken());
+            if (authData == null) {
+                throw new BadRequestException("Invalid AuthToken");
+            }
+
+            // Attempt to get game data
+            gameData = Server.gameDAO.getGame(msg.getGameID());
+            if (gameData == null) {
+                throw new BadRequestException("Invalid Game ID");
+            }
+        } catch (DataAccessException | BadRequestException e) {
+            // Send an error message to the client
+            ServerMessage errorMessage = new ServerMessage(e.getMessage(), null);
             session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
@@ -84,15 +94,24 @@ public class WebSocketHandler {
             announceNotification(session, notify, "notUser", gameData.gameID());
         }
         Server.sessions.put(session, gameData.gameID());
+
     }
     private void makeMove(Session session, UserGameCommand msg) throws DataAccessException, BadRequestException, IOException {
-        AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
-        GameData gameData = Server.gameDAO.getGame(msg.getGameID());
-        if (authData == null){
-            ServerMessage errorMessage = new ServerMessage("invalid AuthToken", null);
+        AuthData authData;
+        try {
+            // Attempt to get auth data
+            authData = Server.authDAO.getAuth(msg.getAuthToken());
+            if (authData == null) {
+                throw new BadRequestException("Invalid AuthToken");
+            }
+        } catch (DataAccessException e){
+            ServerMessage errorMessage = new ServerMessage("Invalid AuthToken", null);
             session.getRemote().sendString(new Gson().toJson(errorMessage));
             return;
         }
+
+        GameData gameData = Server.gameDAO.getGame(msg.getGameID());
+
         ChessGame.TeamColor color =  getColor(gameData, authData.username());
 
         if (gameData.game().getTeamTurn() != color){

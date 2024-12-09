@@ -54,7 +54,7 @@ public class SQLAuth implements AuthDAO{
                 }
             }
         } catch (SQLException e) {
-            return null;
+            throw new DataAccessException("authToken not found" + authToken);
         }
     }
 

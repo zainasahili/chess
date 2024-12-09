@@ -92,7 +92,8 @@ public class SQLGame implements GameDAO{
                 }
             }
         } catch (SQLException e){
-            return null;
+            throw new BadRequestException(e.getMessage());
+
         } catch (DataAccessException e ) {
             throw new DataAccessException(e.getMessage());
         }
