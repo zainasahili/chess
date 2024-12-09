@@ -145,7 +145,8 @@ public class WebSocketHandler {
             announceNotification(session, notification, "notUser", gameData.gameID());
 
             if (gameData.game().isInCheckmate(oppColor)){
-                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate! %s wins".formatted(authData.username()), null);
+                note =  "Checkmate! %s wins".formatted(authData.username());
+                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,note, null);
                 announceNotification(session, notification, "everyone", gameData.gameID());
                 gameData.game().setGameOver(true);
             } else if (gameData.game().isInCheck(oppColor)){
@@ -153,7 +154,8 @@ public class WebSocketHandler {
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, note, gameData.gameID());
                 announceNotification(session, notification, "everyone", gameData.gameID());
             } else if (gameData.game().isInStalemate(oppColor)){
-                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "The game is in Stalemate. It's a tie!", gameData.gameID());
+                note = "The game is in Stalemate. It's a tie!";
+                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, note, gameData.gameID());
                 gameData.game().setGameOver(true);
                 announceNotification(session, notification, "everyone", gameData.gameID());
             }
@@ -163,7 +165,8 @@ public class WebSocketHandler {
     private void leave(Session session, UserGameCommand msg) throws IOException {
         try{
             AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
-            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()), null);
+            String note =  "%s has left the game".formatted(auth.username());
+            ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,note , null);
             announceNotification(session, notify, "notUser", msg.getGameID());
             Server.sessions.remove(session);
             GameData gameData = Server.gameDAO.getGame(msg.getGameID());
