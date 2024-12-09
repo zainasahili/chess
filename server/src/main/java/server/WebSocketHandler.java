@@ -30,7 +30,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
+    public void onMessage(Session session, String message) throws DataAccessException, BadRequestException, IOException {
         UserGameCommand msg = new Gson().fromJson(message, UserGameCommand.class);
 
         if (msg.getCommandType().equals(UserGameCommand.CommandType.MAKE_MOVE)){
@@ -77,16 +77,15 @@ public class WebSocketHandler {
                 return;
             }
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, String.format("%s has joined the game as %s", authData.username(), color), null);
-            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+            announceNotification(session, notify, "notUser", gameData.gameID());
 
         } else{
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has joined the game as an observer".formatted(authData.username()), null);
-            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+            announceNotification(session, notify, "notUser", gameData.gameID());
         }
-
-
+        Server.sessions.put(session, gameData.gameID());
     }
-    private void makeMove(Session session, UserGameCommand msg) throws DataAccessException, BadRequestException, IOException, InvalidMoveException {
+    private void makeMove(Session session, UserGameCommand msg) throws DataAccessException, BadRequestException, IOException {
         AuthData authData = Server.authDAO.getAuth(msg.getAuthToken());
         GameData gameData = Server.gameDAO.getGame(msg.getGameID());
         if (authData == null){
@@ -119,26 +118,23 @@ public class WebSocketHandler {
             ChessGame.TeamColor oppColor = color == ChessGame.TeamColor.WHITE? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
 
             ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
-            announceNotification(session,command, authData.authToken(), "notUser");
+            announceNotification(session,command, "everyone", gameData.gameID());
 
             notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, " a move has been made by %s".formatted(authData.username()), null);
-            announceNotification(session, notification, msg.getAuthToken(), "notUser");
-
+            announceNotification(session, notification, "notUser", gameData.gameID());
 
             if (gameData.game().isInCheckmate(oppColor)){
-                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate! %s wins".formatted(authData.username()), gameData.gameID());
+                notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Checkmate! %s wins".formatted(authData.username()), null);
+                announceNotification(session, notification, "everyone", gameData.gameID());
                 gameData.game().setGameOver(true);
-                announceNotification(session, notification, msg.getAuthToken(), "everyone");
             } else if (gameData.game().isInCheck(oppColor)){
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "Because of the last move, %s is now in check".formatted(oppColor.toString()), gameData.gameID());
-                announceNotification(session, notification, msg.getAuthToken(), "everyone");
+                announceNotification(session, notification, "everyone", gameData.gameID());
             } else if (gameData.game().isInStalemate(oppColor)){
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "The game is in Stalemate. It's a tie!", gameData.gameID());
                 gameData.game().setGameOver(true);
-                announceNotification(session, notification, msg.getAuthToken(), "everyone");
+                announceNotification(session, notification, "everyone", gameData.gameID());
             }
-
-            session.getRemote().sendString(new Gson().toJson(command));
 
         }
     }
@@ -147,7 +143,7 @@ public class WebSocketHandler {
             AuthData auth = Server.authDAO.getAuth(msg.getAuthToken());
 
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has left the game".formatted(auth.username()), null);
-            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+            announceNotification(session, notify, "notUser", msg.getGameID());
             Server.sessions.remove(session);
             GameData gameData = Server.gameDAO.getGame(msg.getGameID());
 
@@ -189,36 +185,29 @@ public class WebSocketHandler {
             Server.gameDAO.updateGame(gameData);
             ServerMessage notify = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, "%s has resigned. %s wins!!".formatted(auth.username(), oppUsername), null);
             session.getRemote().sendString(new Gson().toJson(notify));
-            announceNotification(session, notify, msg.getAuthToken(), "notUser");
+            announceNotification(session, notify, "notUser", gameData.gameID());
         } catch (DataAccessException | BadRequestException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void announceNotification(Session currSession, ServerMessage notification, String authToken, String audience) throws IOException {
-        // to everyone, user, notUser
-        for (var session: Server.sessions.keySet()){
-            boolean in = Server.sessions.get(session) != 0;
-            boolean same = Server.sessions.get(session).equals(Server.sessions.get(currSession));
-            boolean toSelf = session == currSession;
-            switch (audience) {
-                case ("everyone"):
+    private void announceNotification(Session currSession, ServerMessage notification, String audience, int gameID) throws IOException {
+        // to everyone, user, notUser in current game
+        for(var session :Server.sessions.entrySet()){
+            boolean in = session.getValue() == gameID;
+            boolean  self = session.getKey().equals(currSession);
+            switch (audience){
+                case("everyone"):
                     if (in) {
-                        session.getRemote().sendString(new Gson().toJson(notification));
+                        session.getKey().getRemote().sendString(new Gson().toJson(notification));
                     }
                     break;
-                case ("notUser"):
-                    if (!toSelf) {
-                        session.getRemote().sendString(new Gson().toJson(notification));
-                    }
-                    break;
-                case ("user"):
-                    if ((toSelf || same) && in) {
-                        session.getRemote().sendString(new Gson().toJson(notification));
+                case "notUser":
+                    if (!self && in){
+                        session.getKey().getRemote().sendString(new Gson().toJson(notification));
                     }
                     break;
             }
-
         }
     }
     private ChessGame.TeamColor getColor(GameData gameData, String username){
