@@ -1,34 +1,41 @@
 package ui;
 
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashSet;
 
 import static ui.EscapeSequences.*;
 
 public class BoardLayout {
 
-    ChessBoard board;
+    ChessGame game;
 
-    public BoardLayout(ChessBoard board) {
-        this.board = board;
+    public BoardLayout(ChessGame game) {
+        this.game = game;
     }
 
-    public void printBoard(){
+    public void printBoard(ChessGame.TeamColor color, ChessPosition position){
         StringBuilder out = new StringBuilder();
 
-        boolean reversed = true;
-
-        for (int  i = 0; i < 2; i++){
+        boolean reversed = color == ChessGame.TeamColor.BLACK;
+        Collection<ChessMove> possibles = position != null? game.validMoves(position): null;
+        HashSet<ChessPosition> squares = HashSet.newHashSet(possibles != null ? possibles.size() : 0);
+        if (possibles != null){
+            for (ChessMove move: possibles){
+                squares.add(move.getEndPosition());
+            }
+        }
+        int count = color == null? 2 : 1;
+        for (int  i = 0; i < count; i++){
 
             out.append(printHeader(reversed));
             out.append("\n");
 
             for (int x = 8; x > 0; x--){
                 int row = reversed? x : (x * -1) + 9;
-                out.append(printRow(reversed, row));
+                out.append(printRow(reversed, row, position, squares));
             }
 
             out.append(printHeader(reversed));
@@ -36,11 +43,10 @@ public class BoardLayout {
             if (i < 1) {
                 out.append("\n");
             }
-            reversed = false;
+            reversed = !reversed;
             out.append(RESET_TEXT_BOLD_FAINT);
             out.append(RESET_TEXT_COLOR);
         }
-
 
         System.out.println(out);
 
@@ -55,7 +61,7 @@ public class BoardLayout {
         return out;
 
     }
-    public  String printRow(boolean reversed, int row){
+    public  String printRow(boolean reversed, int row, ChessPosition position, HashSet<ChessPosition> squares){
         StringBuilder out = new StringBuilder();
         out.append(SET_BG_COLOR_LIGHT_GREY);
         out.append(SET_TEXT_COLOR_BLACK);
@@ -63,19 +69,7 @@ public class BoardLayout {
 
         for (int i = 1; i < 9; i++){
             int col = reversed? i : (i * -1) + 9;
-            if (row % 2 == 0){
-                if (col % 2 == 0){
-                out.append(SET_BG_COLOR_BLACK);
-                } else{
-                    out.append(SET_BG_COLOR_WHITE);
-                }
-            } else {
-                if (col % 2 != 0){
-                    out.append(SET_BG_COLOR_BLACK);
-                } else{
-                    out.append(SET_BG_COLOR_WHITE);
-                }
-            }
+            out.append(squareColor(row, col, position, squares));
             out.append(getPiece(row, col));
         }
 
@@ -89,10 +83,31 @@ public class BoardLayout {
         return out.toString();
     }
 
+    private String squareColor(int row, int col, ChessPosition position ,HashSet<ChessPosition> squares){
+        ChessPosition current = new ChessPosition(row, col);
+        if (current.equals(position)){
+            return SET_BG_COLOR_BLUE;
+        } else if (squares.contains(current)){
+            return SET_BG_COLOR_MAGENTA;
+        } if (row % 2 == 0){
+            if (col % 2 == 0){
+                return SET_BG_COLOR_BLACK;
+            } else{
+                return SET_BG_COLOR_WHITE;
+            }
+        } else {
+            if (col % 2 != 0){
+                return SET_BG_COLOR_BLACK;
+            } else{
+                return SET_BG_COLOR_WHITE;
+            }
+        }
+    }
+
     public  String getPiece(int row, int col){
         StringBuilder out = new StringBuilder();
         ChessPosition position = new ChessPosition(row, col);
-        ChessPiece piece = board.getPiece(position);
+        ChessPiece piece = game.getBoard().getPiece(position);
         if (piece != null) {
             out.append(SET_TEXT_BOLD);
             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {

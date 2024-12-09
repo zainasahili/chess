@@ -68,7 +68,6 @@ public class PostLogin {
                             facade.joinPlayer(game.gameID(), color);
                             GamePlay gamePlay = new GamePlay(facade, game, color);
                             gamePlay.run();
-                            new BoardLayout(game.game().getBoard()).printBoard();
                         }
                         else{
                             System.out.println("Color taken or game doesn't exist");
@@ -88,7 +87,6 @@ public class PostLogin {
                         facade.observe(game.gameID());
                         GamePlay gamePlay = new GamePlay(facade, game);
                         gamePlay.run();
-                        new BoardLayout(game.game().getBoard()).printBoard();
                     }
                     break;
                 default:

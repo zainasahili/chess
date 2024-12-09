@@ -150,13 +150,13 @@ public class ServerFacade {
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
-    public void leaveGame(int gameID){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, null);
+    public void leaveGame(int gameID, ChessGame.TeamColor color){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
-    public void resign(int gameID){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, null);
+    public void resign(int gameID, ChessGame.TeamColor color){
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }

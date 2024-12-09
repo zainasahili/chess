@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import client.ServerFacade;
 import model.GameData;
 
@@ -13,19 +10,21 @@ import java.util.Scanner;
 public class GamePlay {
 
     ServerFacade facade;
-    BoardLayout boardLayout;
+    public static BoardLayout boardLayout;
     int gameID;
     ChessGame.TeamColor color;
 
     public GamePlay(ServerFacade facade, GameData gameData) {
         this.facade = facade;
         this.gameID = gameData.gameID();
+        boardLayout = new BoardLayout(gameData.game());
     }
 
     public GamePlay(ServerFacade facade, GameData gameData, ChessGame.TeamColor color) {
         this.facade = facade;
         this.gameID = gameData.gameID();
         this.color = color;
+        boardLayout = new BoardLayout(gameData.game());
     }
 
 
@@ -39,11 +38,11 @@ public class GamePlay {
                     helpMenu();
                     break;
                 case "redraw":
-                    boardLayout.printBoard();
+                    boardLayout.printBoard(color, null);
                     break;
                 case "leave":
                     in = false;
-                    facade.leaveGame(gameID);
+                    facade.leaveGame(gameID, color);
                     break ;
                 case "make move":
                     makeMove(input);
@@ -52,14 +51,14 @@ public class GamePlay {
                     System.out.println("Are you sure you want to resign? (yes/no)");
                     String[] answer = getInput();
                     if (answer.length == 1 && Objects.equals(answer[0], "yes")) {
-                        facade.resign(gameID);
+                        facade.resign(gameID, color);
                     } else {
                         System.out.println("Resignation cancelled");
                     }
                     break;
                 case "highlight":
                     if (input.length == 2 && input[1].matches("[a-h][1-8]")) {
-                        boardLayout.printBoard();
+                        boardLayout.printBoard(color, new ChessPosition(1,1));
                     } else {
                         System.out.println("Please provide coordinates");
                         System.out.println("Highlight <coordinates> (ex: b3) - highlight all legal moves for the piece");
