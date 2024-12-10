@@ -70,7 +70,7 @@ public class WebSocketHandler {
             return;
         }
 
-        ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
+        ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID(), gameData.game());
         session.getRemote().sendString(new Gson().toJson(command));
 
         ChessGame.TeamColor color = getColor(gameData, authData.username());
@@ -134,18 +134,17 @@ public class WebSocketHandler {
                 return;
             }
             Server.gameDAO.updateGame(gameData);
-
             ServerMessage notification;
             ChessGame.TeamColor oppColor = color == ChessGame.TeamColor.WHITE? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
-
-            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID());
+            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.blackUsername(): gameData.whiteUsername();
+            ServerMessage command = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, msg.getGameID(), gameData.game());
             announceNotification(session,command, "everyone", gameData.gameID());
-            String note =  "a move has been made by %s".formatted(authData.username());
+            String note =  "a move from %s to %s has been made by %s".formatted(msg.getMove().getStartPosition(), msg.getMove().getEndPosition(), authData.username());
             notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,note, null);
             announceNotification(session, notification, "notUser", gameData.gameID());
 
             if (gameData.game().isInCheckmate(oppColor)){
-                note =  "Checkmate! %s wins".formatted(authData.username());
+                note =  "%s is in Checkmate! %s wins".formatted(oppUsername, authData.username());
                 notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION,note, null);
                 announceNotification(session, notification, "everyone", gameData.gameID());
                 gameData.game().setGameOver(true);
@@ -198,7 +197,7 @@ public class WebSocketHandler {
                 session.getRemote().sendString(new Gson().toJson(error));
                 return;
             }
-            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.whiteUsername() : gameData.blackUsername();
+            String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.blackUsername() : gameData.whiteUsername();
 
             if (gameData.game().isGameOver()){
                 ServerMessage error = new ServerMessage("Game is already over", null);
@@ -212,7 +211,7 @@ public class WebSocketHandler {
             session.getRemote().sendString(new Gson().toJson(notify));
             announceNotification(session, notify, "notUser", gameData.gameID());
             Server.sessions.remove(session);
-            session.close();
+//            session.close();
         } catch (DataAccessException | BadRequestException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -229,7 +228,7 @@ public class WebSocketHandler {
                         session.getKey().getRemote().sendString(new Gson().toJson(notification));
                     }
                     break;
-                case "notUser":
+                case ("notUser"):
                     if (!self && in){
                         session.getKey().getRemote().sendString(new Gson().toJson(notification));
                     }

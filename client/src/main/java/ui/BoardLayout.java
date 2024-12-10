@@ -12,6 +12,8 @@ public class BoardLayout {
 
     ChessGame game;
 
+    public static ChessGame.TeamColor team;
+
     public BoardLayout(ChessGame game) {
         this.game = game;
     }
@@ -27,8 +29,8 @@ public class BoardLayout {
                 squares.add(move.getEndPosition());
             }
         }
-        int count = color == null? 2 : 1;
-        for (int  i = 0; i < count; i++){
+
+        for (int  i = 0; i < 1; i++){
 
             out.append(printHeader(reversed));
             out.append("\n");
@@ -40,10 +42,8 @@ public class BoardLayout {
 
             out.append(printHeader(reversed));
             out.append("\n");
-            if (i < 1) {
                 out.append("\n");
-            }
-            reversed = !reversed;
+
             out.append(RESET_TEXT_BOLD_FAINT);
             out.append(RESET_TEXT_COLOR);
         }

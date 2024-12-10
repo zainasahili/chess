@@ -2,9 +2,9 @@ package ui;
 
 import chess.ChessGame;
 import client.ServerFacade;
-import client.WebSocket;
 import model.GameData;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +19,7 @@ public class PostLogin {
         this.facade = facade;
     }
 
-    public void run(){
+    public void run() throws IOException {
         boolean loggedIn = true;
 
         while (loggedIn){
@@ -45,7 +45,7 @@ public class PostLogin {
                     break;
                 case "list":
                     games = facade.listGames();
-                    int i = 0;
+                    int i = 1;
                     for (GameData game: games){
                         System.out.printf("%d. Game: %s, WhitePlayer: %s, BlackPlayer: %s\n",
                                 i, game.gameName(), game.whiteUsername(), game.blackUsername());
@@ -53,18 +53,19 @@ public class PostLogin {
                     }
                     break;
                 case "join":
-                    if (input.length != 3 || !input[1].matches("\\d") || !input[2].toUpperCase().matches("WHITE|BLACK")){
+                    if (input.length != 3 || !input[1].matches("\\d{1,2}") || !input[2].toUpperCase().matches("WHITE|BLACK")){
                         System.out.println("Choose a game ID and player color");
                         System.out.println("join <ID> [WHITE|BLACK]");
                     }
                     else {
                         games = facade.listGames();
                         List<GameData> result = new ArrayList<>(games);
-                        GameData game = result.get(Integer.parseInt(input[1]));
+                        GameData game = result.get(Integer.parseInt(input[1])-1);
                         ChessGame.TeamColor color = input[2].equalsIgnoreCase("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK;
                         if (facade.joinGame(color, game.gameID())){
                             System.out.println("You have joined the game");
                             facade.connectToWs();
+                            BoardLayout.team = color;
                             facade.joinPlayer(game.gameID(), color);
                             GamePlay gamePlay = new GamePlay(facade, game, color);
                             gamePlay.run();
@@ -82,7 +83,7 @@ public class PostLogin {
                     else {
                         games = facade.listGames();
                         List<GameData> result = new ArrayList<>(games);
-                        GameData game = result.get(Integer.parseInt(input[1]));
+                        GameData game = result.get(Integer.parseInt(input[1])-1);
                         facade.connectToWs();
                         facade.observe(game.gameID());
                         GamePlay gamePlay = new GamePlay(facade, game);

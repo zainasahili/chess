@@ -3,6 +3,7 @@ package ui;
 import client.ServerFacade;
 
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class PreLogin {
@@ -13,7 +14,7 @@ public class PreLogin {
         this.facade = facade;
     }
 
-    public void run(){
+    public void run() throws IOException {
         boolean loggedIn = false;
 
         while (!loggedIn) {

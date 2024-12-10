@@ -13,9 +13,7 @@ import java.util.Objects;
 public class UserGameCommand {
 
     private final CommandType commandType;
-
     private final String authToken;
-
     private final Integer gameID;
     private ChessMove move;
     private final ChessGame.TeamColor color;

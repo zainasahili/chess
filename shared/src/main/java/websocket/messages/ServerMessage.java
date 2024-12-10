@@ -1,18 +1,20 @@
 package websocket.messages;
 
+import chess.ChessGame;
 import java.util.Objects;
 
 /**
  * Represents a Message the server can send through a WebSocket
- * 
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
     private String errorMessage;
-    private Integer game;
+    private final Integer gameID;
     private String message;
+    private ChessGame game;
+    private ChessGame.TeamColor color;
 
     public enum ServerMessageType {
         LOAD_GAME,
@@ -20,21 +22,23 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type, Integer game) {
+    public ServerMessage(ServerMessageType type, Integer gameID, ChessGame game) {
         this.serverMessageType = type;
+        this.gameID = gameID;
         this.game = game;
+        this.color = game.getTeamTurn();
     }
 
-    public ServerMessage(String errorMessage, Integer game){
+    public ServerMessage(String errorMessage, Integer gameID){
         this.serverMessageType = ServerMessageType.ERROR;
         this.errorMessage = errorMessage;
-        this.game = game;
+        this.gameID = gameID;
     }
 
-    public ServerMessage(ServerMessageType type, String message, Integer game){
+    public ServerMessage(ServerMessageType type, String message, Integer gameID){
         this.serverMessageType = type;
         this.message = message;
-        this.game = game;
+        this.gameID = gameID;
     }
 
     public ServerMessageType getServerMessageType() {
@@ -45,8 +49,16 @@ public class ServerMessage {
         return errorMessage;
     }
 
-    public int getGame(){
+    public int getGameID(){
+        return gameID;
+    }
+
+    public ChessGame getGame(){
         return game;
+    }
+
+    public ChessGame.TeamColor getColor(){
+        return color;
     }
 
     public String getMessage(){

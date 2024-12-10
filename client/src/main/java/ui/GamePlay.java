@@ -4,6 +4,7 @@ import chess.*;
 import client.ServerFacade;
 import model.GameData;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -13,11 +14,14 @@ public class GamePlay {
     public static BoardLayout boardLayout;
     int gameID;
     ChessGame.TeamColor color;
+    GameData gameData;
 
     public GamePlay(ServerFacade facade, GameData gameData) {
         this.facade = facade;
         this.gameID = gameData.gameID();
         boardLayout = new BoardLayout(gameData.game());
+        this.color= null;
+        this.gameData = gameData;
     }
 
     public GamePlay(ServerFacade facade, GameData gameData, ChessGame.TeamColor color) {
@@ -25,10 +29,11 @@ public class GamePlay {
         this.gameID = gameData.gameID();
         this.color = color;
         boardLayout = new BoardLayout(gameData.game());
+        this.gameData = gameData;
     }
 
 
-    public void run(){
+    public void run() throws IOException {
         boolean in = true;
         while (in){
             String[] input = getInput();
@@ -38,7 +43,7 @@ public class GamePlay {
                     helpMenu();
                     break;
                 case "redraw":
-                    boardLayout.printBoard(color, null);
+                    facade.redraw(gameID, gameData.game());
                     break;
                 case "leave":
                     in = false;
@@ -46,14 +51,12 @@ public class GamePlay {
                     break ;
                 case "move":
                     makeMove(input);
-                    boardLayout.printBoard(color, null);
                     break;
                 case "resign":
                     System.out.println("Are you sure you want to resign? (yes/no)");
                     String[] answer = getInput();
                     if (answer.length == 1 && Objects.equals(answer[0], "yes")) {
                         facade.resign(gameID, color);
-                        in = false;
                     } else {
                         System.out.println("Resignation cancelled");
                     }
@@ -77,7 +80,7 @@ public class GamePlay {
     }
 
     private String[] getInput() {
-        System.out.print("\n[IN_GAME] >>> ");
+        System.out.print("\n[IN_GAME] >>> \n");
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine().split(" ");
     }
@@ -87,13 +90,12 @@ public class GamePlay {
         System.out.println("move <from> <to> <promotion piece> - make a move (promotion piece should only be used if a move will promote a pawn)");
         System.out.println("resign - resign from a game");
         System.out.println("highlight <coordinates> - highlight all legal moves for the piece");
+        System.out.println("help - with possible commands");
     }
-    private void makeMove(String[] input){
+    private void makeMove(String[] input) throws IOException {
         if (input.length >= 3 && input[1].matches("[a-h][1-8]") && input[2].matches("[a-h][1-8]")){
-            ChessPosition from = new ChessPosition(input[1].charAt(1), input[1].charAt(0) - ('a'-1));
-            System.out.println(from);
-            ChessPosition to = new ChessPosition(input[2].charAt(1), input[2].charAt(0) - ('a'-1));
-            System.out.println(to);
+            ChessPosition from = new ChessPosition(input[1].charAt(1) - '0', input[1].charAt(0) - 'a' + 1);
+            ChessPosition to = new ChessPosition(input[2].charAt(1) - '0', input[2].charAt(0) - 'a' + 1);
             ChessPiece.PieceType promotion = null;
             if (input.length == 4){
                 promotion = getPieceType(input[3]);
@@ -102,7 +104,9 @@ public class GamePlay {
                     System.out.println("move <from> <to> <promotion piece> - (promotion piece should only be used if a move will promote a pawn)");
                 }
             }
-            facade.makeMove(gameID, new ChessMove(from, to, promotion));
+            if ((input.length == 4 && promotion != null) || input.length == 3) {
+                facade.makeMove(gameID, new ChessMove(from, to, promotion), color);
+            }
         } else{
             System.out.println("please provide from and to coordinates. ex: 4a 5c");
             System.out.println("move <from> <to> <promotion piece> - (promotion piece should only be used if a move will promote a pawn)");

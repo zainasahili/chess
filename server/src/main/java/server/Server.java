@@ -19,6 +19,7 @@ public class Server {
     UserService userService = new UserService(userDAO, authDAO);
     GameService gameService = new GameService(gameDAO, authDAO);
     Handler handler = new Handler(userService, gameService);
+    WebSocketHandler webSocketHandler = new WebSocketHandler();
 
 
     static ConcurrentHashMap<Session, Integer> sessions = new ConcurrentHashMap<>();
@@ -29,7 +30,7 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-        Spark.webSocket("/ws", WebSocketHandler.class);
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.post("/user", handler::register);
         Spark.post("/session", handler::login);
         Spark.delete("/session", handler::logout);

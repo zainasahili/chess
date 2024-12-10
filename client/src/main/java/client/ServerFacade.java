@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.GameData;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,31 +145,37 @@ public class ServerFacade {
             System.out.println("Failed to connect to WebSocket");
         }
     }
-    public void joinPlayer(int gameID, ChessGame.TeamColor color){
+    public void joinPlayer(int gameID, ChessGame.TeamColor color) throws IOException {
         UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
-    public void observe(int gameID){
+    public void observe(int gameID) throws IOException {
         UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID, null);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
-    public void leaveGame(int gameID, ChessGame.TeamColor color){
+    public void leaveGame(int gameID, ChessGame.TeamColor color) throws IOException {
         UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
-    public void resign(int gameID, ChessGame.TeamColor color){
+    public void resign(int gameID, ChessGame.TeamColor color) throws IOException {
         UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
     }
 
-    public void makeMove(int gameID, ChessMove move){
-        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, null);
+    public void makeMove(int gameID, ChessMove move, ChessGame.TeamColor color) throws IOException {
+        UserGameCommand msg = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move, color);
         String command = new Gson().toJson(msg);
         ws.sendMessage(command);
+    }
+
+    public void redraw(Integer gameID, ChessGame game) {
+        ServerMessage msg = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, gameID, game);
+        String command = new Gson().toJson(msg);
+        ws.handleMessage(command);
     }
 
 
