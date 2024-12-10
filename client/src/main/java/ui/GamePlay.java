@@ -15,21 +15,24 @@ public class GamePlay {
     int gameID;
     ChessGame.TeamColor color;
     GameData gameData;
+    ChessGame game;
 
     public GamePlay(ServerFacade facade, GameData gameData) {
         this.facade = facade;
         this.gameID = gameData.gameID();
-        boardLayout = new BoardLayout(gameData.game());
         this.color= null;
         this.gameData = gameData;
+        this.game = gameData.game();
+        boardLayout = new BoardLayout(game);
     }
 
     public GamePlay(ServerFacade facade, GameData gameData, ChessGame.TeamColor color) {
         this.facade = facade;
         this.gameID = gameData.gameID();
         this.color = color;
-        boardLayout = new BoardLayout(gameData.game());
         this.gameData = gameData;
+        this.game = gameData.game();
+        boardLayout = new BoardLayout(game);
     }
 
 
@@ -43,7 +46,7 @@ public class GamePlay {
                     helpMenu();
                     break;
                 case "redraw":
-                    facade.redraw(gameID, gameData.game());
+                    boardLayout.printBoard(color, null);
                     break;
                 case "leave":
                     in = false;

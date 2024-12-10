@@ -18,6 +18,10 @@ public class BoardLayout {
         this.game = game;
     }
 
+    public void updateGame(ChessGame game){
+        this.game = game;
+    }
+
     public void printBoard(ChessGame.TeamColor color, ChessPosition position){
         StringBuilder out = new StringBuilder();
 
@@ -86,7 +90,7 @@ public class BoardLayout {
     private String squareColor(int row, int col, ChessPosition position ,HashSet<ChessPosition> squares){
         ChessPosition current = new ChessPosition(row, col);
         if (current.equals(position)){
-            return SET_BG_COLOR_BLUE;
+            return SET_BG_COLOR_LIGHT_GREY;
         } else if (squares.contains(current)){
             return SET_BG_COLOR_MAGENTA;
         } if (row % 2 == 0){

@@ -22,6 +22,7 @@ public class ServerFacade {
     WebSocket ws;
     String serverDomain;
 
+
     public ServerFacade(){
         this("localhost:8080");
     }

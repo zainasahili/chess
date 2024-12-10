@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 
 import com.google.gson.Gson;
 import ui.BoardLayout;
+import ui.GamePlay;
 import websocket.messages.ServerMessage;
 
 public class WebSocket extends Endpoint {
@@ -34,6 +35,7 @@ public class WebSocket extends Endpoint {
         ServerMessage msg = new Gson().fromJson(message, ServerMessage.class);
         BoardLayout boardLayout = new BoardLayout(msg.getGame());
         if (msg.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)){
+            GamePlay.boardLayout.updateGame(msg.getGame());
             boardLayout.printBoard(BoardLayout.team, null);
         } else if (msg.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)){
             System.out.println(msg.getMessageError());

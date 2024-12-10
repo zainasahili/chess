@@ -11,6 +11,8 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import ui.BoardLayout;
+import ui.GamePlay;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 import java.io.IOException;
@@ -113,7 +115,6 @@ public class WebSocketHandler {
         }
 
         GameData gameData = Server.gameDAO.getGame(msg.getGameID());
-
         ChessGame.TeamColor color =  getColor(gameData, authData.username());
 
         if (gameData.game().getTeamTurn() != color){
@@ -134,6 +135,7 @@ public class WebSocketHandler {
                 return;
             }
             Server.gameDAO.updateGame(gameData);
+            GamePlay.boardLayout = new BoardLayout(Server.gameDAO.getGame(gameData.gameID()).game());
             ServerMessage notification;
             ChessGame.TeamColor oppColor = color == ChessGame.TeamColor.WHITE? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             String oppUsername = color == ChessGame.TeamColor.WHITE? gameData.blackUsername(): gameData.whiteUsername();
